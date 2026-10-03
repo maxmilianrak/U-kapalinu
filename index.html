@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<!-- ══════════════════════════════════════════════════════════════════════
+     RESTAURACE U KAPALÍNŮ — Sobín, Praha 17
+     Jeden soubor. Dvojklik = prohlížeč, VS Code = úpravy.
+
+     Obsah (menu, lístek, akce) se tahá z administrace na /admin.
+     Výchozí obsah je v souboru obsah-vychozi.js vedle tohoto.
+
+     Před spuštěním zkontrolujte místa označená  ‼️ UPRAVIT
+     ══════════════════════════════════════════════════════════════════════ -->
+
+<title>Restaurace U Kapalínů — česká hospoda v Sobíně, Praha 17</title>
+<meta name="description" content="Česká hospoda v Sobíně: zahrádka s dětským hřištěm, parkování zdarma, sportovní přenosy, oslavy a rauty. Otevřeno denně od 10:00. Rezervace na WhatsApp.">
+<meta name="author" content="Restaurace U Kapalínů">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<!-- ‼️ UPRAVIT: finální doména -->
+<link rel="canonical" href="https://www.ukapalinu.cz/">
+<meta name="theme-color" content="#0E2A4D">
+<meta name="format-detection" content="telephone=yes">
+
+<meta name="geo.region" content="CZ-10">
+<meta name="geo.placename" content="Sobín, Praha 17">
+<meta name="geo.position" content="50.063812;14.270812">
+<meta name="ICBM" content="50.063812, 14.270812">
+
+<meta property="og:type" content="restaurant.restaurant">
+<meta property="og:locale" content="cs_CZ">
+<meta property="og:site_name" content="Restaurace U Kapalínů">
+<meta property="og:title" content="Restaurace U Kapalínů — česká hospoda v Sobíně">
+<meta property="og:description" content="Zahrádka s dětským hřištěm, velké parkoviště, sportovní přenosy, oslavy a rauty. Hostivická 8/10, Praha 17.">
+<meta property="og:url" content="https://www.ukapalinu.cz/">
+<meta property="og:image" content="https://www.ukapalinu.cz/fotky/hero-zahradka.jpg">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:image:alt" content="Zahrádka restaurace U Kapalínů plná hostů">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Restaurace U Kapalínů — česká hospoda v Sobíně">
+<meta name="twitter:description" content="Zahrádka s hřištěm, parkování zdarma, sportovní přenosy, oslavy a rauty.">
+<meta name="twitter:image" content="https://www.ukapalinu.cz/fotky/hero-zahradka.jpg">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230E2A4D'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23E9A62B' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="image" href="fotky/hero-zahradka.jpg" fetchpriority="high">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,400..900;1,62..125,400..900&family=Figtree:wght@400;500;600;700;800&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════
+   1. TOKENY
+   Hlavní barvy jsou modrá a zlatá — modř z hlavičky jejich tištěného
+   lístku, zlatá jako světlo a pivo. Červená se objevuje jen v drobnostech:
+   popisky sekcí, značka „zavřeno", rámeček dnešního dne.
+   ═══════════════════════════════════════════════════════════════════ */
+:root{
+  --inkoust:    #0E2A4D;   /* nejtmavší modř — tmavé pasáže, nadpisy  */
+  --inkoust-2:  #071829;   /* ještě tmavší — překryvy přes fotky      */
+  --modra:      #1D4E89;   /* modř z lístku — hlavní barva, tlačítka  */
+  --modra-sv:   #2F6EB5;   /* světlejší modř — hover                  */
+  --zlata:      #E9A62B;   /* zlatá — akcenty, pruh Dnes, čísla       */
+  --zlata-hi:   #F8C75C;   /* rozsvícená zlatá                        */
+  --zlata-tl:   #B57D14;   /* tmavší zlatá — text na světlém podkladu */
+  --cervena:    #C0392B;   /* jen detaily: popisky, zavřeno, dnešek   */
+  --papir:      #FDF6E9;   /* krémový papír — hlavní podklad          */
+  --papir-2:    #F7ECD8;   /* tmavší krém — střídání sekcí            */
+  --papir-3:    #E6D7BB;   /* linky a okraje                          */
+  --seda:       #5A6A7B;   /* vedlejší text na krému                  */
+  --seda-sv:    #AFC0CF;   /* vedlejší text na tmavém                 */
+  --zelena:     #3E8E5A;   /* jen stav „otevřeno"                     */
+  --whatsapp:   #1FA855;
+  --whatsapp-hi:#25C765;
+
+  --ff-nadpis: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --ff-text:   "Figtree", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --ff-data:   "DM Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --max: 1440px;                 /* širší obsah, ať po stranách nezbývá prázdno */
+  --okraj: clamp(1.15rem, 4vw, 3.5rem);
+  --max-obsah: calc(var(--max) - var(--okraj) * 2);
+  --r: 4px;
+  --r-velky: 12px;
+  --prechod: cubic-bezier(.22,.61,.36,1);
+  --prechod-out: cubic-bezier(.16,1,.3,1);
+  --sekce-y: clamp(4.5rem, 9vw, 8.5rem);
+  --stin: 0 18px 40px rgba(14,42,77,.14);
+  --stin-velky: 0 30px 70px rgba(14,42,77,.26);
+}
+
+/* ═══════════ 2. ZÁKLAD ═══════════ */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{
+  margin:0;background:var(--papir);color:var(--inkoust);
+  font-family:var(--ff-text);
+  font-size:clamp(1rem,.95rem + .22vw,1.08rem);
+  line-height:1.65;font-weight:400;
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  overflow-x:hidden;
+}
+body.je-zamknute{overflow:hidden}
+img,svg,video{display:block;max-width:100%}
+img{height:auto}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+ul,ol{margin:0;padding:0;list-style:none}
+h1,h2,h3,h4,p,figure,blockquote,dl,dd{margin:0}
+table{border-collapse:collapse}
+::selection{background:var(--zlata);color:var(--inkoust)}
+:focus-visible{outline:3px solid var(--zlata);outline-offset:3px;border-radius:2px}
+
+.preskocit{
+  position:absolute;left:var(--okraj);top:-120px;z-index:9999;
+  background:var(--modra);color:#fff;padding:.75rem 1.2rem;font-weight:700;
+  border-radius:var(--r);transition:top .25s var(--prechod);
+}
+.preskocit:focus{top:1rem}
+.jen-ctecka{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+
+/* ═══════════ 3. STRÁNKOVÁ MŘÍŽKA ═══════════
+   Místo jednoho úzkého sloupce uprostřed má stránka tři pruhy.
+   Obsah sedí ve středním, fotky se můžou roztáhnout až do kraje —
+   díky tomu po stranách nezbývá prázdné místo. Žádné 100vw, takže
+   se nikdy neobjeví vodorovný posuvník kvůli šířce lišty.             */
+.mrizka{
+  display:grid;
+  grid-template-columns:
+    [kraj-l] minmax(var(--okraj), 1fr)
+    [stred-l] minmax(0, var(--max-obsah))
+    [stred-p] minmax(var(--okraj), 1fr)
+    [kraj-p];
+}
+.mrizka > *{grid-column:stred-l / stred-p}
+.do-kraje{grid-column:kraj-l / kraj-p}
+.do-kraje-vpravo{grid-column:stred-l / kraj-p}
+.do-kraje-vlevo{grid-column:kraj-l / stred-p}
+
+.obal{width:100%;max-width:var(--max);margin-inline:auto;padding-inline:var(--okraj)}
+.sekce{position:relative;padding-block:var(--sekce-y)}
+.sekce--tmava{background:var(--inkoust);color:var(--papir)}
+.sekce--tmava .perex{color:var(--seda-sv)}
+.sekce--tmava .stitek{color:var(--zlata)}
+.sekce--krem{background:var(--papir-2)}
+
+.hlavicka-sekce{margin-bottom:clamp(2.25rem,4vw,3.5rem)}
+.hlavicka-sekce .stitek{margin-bottom:1.1rem}
+.hlavicka-sekce .perex{margin-top:1.15rem}
+.hlavicka-sekce--rada{display:flex;justify-content:space-between;align-items:flex-end;gap:2rem;flex-wrap:wrap}
+
+/* ═══════════ 4. TYPOGRAFIE ═══════════ */
+.nadpis{
+  font-family:var(--ff-nadpis);
+  font-variation-settings:"wdth" 112,"wght" 800;
+  font-weight:800;line-height:1.02;letter-spacing:-.018em;
+  text-wrap:balance;
+}
+.nadpis--obri{
+  font-size:clamp(2.7rem,9vw,7rem);line-height:.94;letter-spacing:-.034em;
+  font-variation-settings:"wdth" 118,"wght" 850;
+}
+.nadpis--velky{font-size:clamp(2rem,5vw,3.9rem);line-height:1}
+.nadpis--stredni{font-size:clamp(1.5rem,3.2vw,2.5rem)}
+.nadpis--maly{
+  font-size:clamp(1.12rem,1.9vw,1.44rem);line-height:1.15;
+  font-variation-settings:"wdth" 104,"wght" 750;
+}
+
+.stitek{
+  display:inline-flex;align-items:flex-start;gap:.55rem;
+  font-family:var(--ff-data);font-size:.69rem;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--cervena);
+  text-wrap:balance;
+}
+.stitek::before{content:"";width:24px;height:3px;margin-top:.62em;background:currentColor;flex:0 0 auto}
+.stitek--svetly{color:var(--zlata)}
+@media (max-width:430px){
+  .stitek{font-size:.64rem;letter-spacing:.13em}
+  .stitek::before{width:18px}
+}
+
+.perex{
+  font-size:clamp(1.04rem,1.4vw,1.24rem);line-height:1.62;
+  color:var(--seda);max-width:60ch;text-wrap:pretty;
+}
+.data{font-family:var(--ff-data);font-size:.82rem;letter-spacing:.02em}
+
+/* ═══════════ 5. TLAČÍTKA ═══════════ */
+.tl{
+  position:relative;display:inline-flex;align-items:center;justify-content:center;
+  gap:.6rem;padding:.95rem 1.6rem;border-radius:var(--r);
+  font-weight:700;font-size:.96rem;line-height:1.2;
+  background:var(--modra);color:#fff;overflow:hidden;isolation:isolate;
+  transition:transform .28s var(--prechod-out),box-shadow .28s var(--prechod);
+  text-align:center;
+}
+.tl::before{
+  content:"";position:absolute;inset:0;z-index:-1;background:var(--modra-sv);
+  transform:translateY(102%);transition:transform .4s var(--prechod-out);
+}
+.tl:hover::before,.tl:focus-visible::before{transform:translateY(0)}
+.tl:hover{transform:translateY(-2px);box-shadow:0 12px 26px rgba(29,78,137,.34)}
+.tl svg{flex:0 0 auto}
+
+.tl--whatsapp{background:var(--whatsapp)}
+.tl--whatsapp::before{background:var(--whatsapp-hi)}
+.tl--whatsapp:hover{box-shadow:0 12px 26px rgba(31,168,85,.36)}
+
+.tl--zlaty{background:var(--zlata);color:var(--inkoust)}
+.tl--zlaty::before{background:var(--zlata-hi)}
+.tl--zlaty:hover{box-shadow:0 12px 26px rgba(233,166,43,.4)}
+
+.tl--duch{background:transparent;color:var(--inkoust);box-shadow:inset 0 0 0 2px var(--papir-3)}
+.tl--duch::before{background:var(--inkoust)}
+.tl--duch:hover,.tl--duch:focus-visible{color:var(--papir);box-shadow:inset 0 0 0 2px var(--inkoust)}
+
+.tl--duch-svetly{background:transparent;color:var(--papir);box-shadow:inset 0 0 0 2px rgba(253,246,233,.4)}
+.tl--duch-svetly::before{background:var(--papir)}
+.tl--duch-svetly:hover,.tl--duch-svetly:focus-visible{color:var(--inkoust);box-shadow:inset 0 0 0 2px var(--papir)}
+
+.tl--velke{padding:1.1rem 2rem;font-size:1.02rem}
+
+/* ═══════════ 6. HLAVIČKA ═══════════ */
+.hlava{
+  position:fixed;inset:0 0 auto;z-index:90;
+  display:flex;align-items:center;gap:1.25rem;
+  padding:.85rem var(--okraj);
+  transition:background .4s var(--prechod),box-shadow .4s var(--prechod),padding .4s var(--prechod);
+}
+.hlava.je-prilepena{
+  background:var(--inkoust);box-shadow:0 2px 0 var(--zlata),0 10px 28px rgba(7,24,41,.28);
+  padding-block:.55rem;
+}
+.hlava__znacka{display:flex;align-items:center;gap:.6rem;flex:0 0 auto;color:var(--papir)}
+.hlava__znak{
+  width:38px;height:38px;flex:0 0 auto;border-radius:7px;
+  background:var(--zlata);color:var(--inkoust);display:grid;place-items:center;
+  font-family:var(--ff-nadpis);font-variation-settings:"wdth" 110,"wght" 850;
+  font-size:1.26rem;line-height:1;
+}
+.hlava__jmeno{display:flex;flex-direction:column;line-height:1.1}
+.hlava__jmeno b{
+  font-family:var(--ff-nadpis);font-variation-settings:"wdth" 104,"wght" 780;
+  font-size:1.05rem;font-weight:780;letter-spacing:-.01em;
+}
+.hlava__jmeno span{font-family:var(--ff-data);font-size:.6rem;letter-spacing:.18em;color:var(--zlata);text-transform:uppercase}
+
+.menu{display:flex;gap:.1rem;margin-inline:auto}
+.menu a{
+  position:relative;padding:.5rem .78rem;font-size:.92rem;font-weight:600;
+  color:var(--papir);opacity:.86;transition:opacity .25s var(--prechod);
+}
+.menu a::after{
+  content:"";position:absolute;left:.78rem;right:.78rem;bottom:.26rem;height:2px;
+  background:var(--zlata);transform:scaleX(0);transform-origin:left;
+  transition:transform .35s var(--prechod);
+}
+.menu a:hover,.menu a:focus-visible{opacity:1}
+.menu a:hover::after,.menu a:focus-visible::after,.menu a.je-tady::after{transform:scaleX(1)}
+
+.hlava__akce{display:flex;align-items:center;gap:.5rem;flex:0 0 auto}
+.hlava__akce .tl{padding:.7rem 1.15rem;font-size:.89rem}
+
+.burger{display:none;width:46px;height:46px;place-items:center;flex:0 0 auto;border-radius:var(--r)}
+.burger i{display:block;width:23px;height:2.5px;background:var(--papir);border-radius:2px;transition:transform .38s var(--prechod),opacity .22s}
+.burger i+i{margin-top:5px}
+.burger[aria-expanded="true"] i:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.burger[aria-expanded="true"] i:nth-child(2){opacity:0}
+.burger[aria-expanded="true"] i:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+
+@media (max-width:1100px){
+  .burger{display:grid}
+  .menu{
+    position:fixed;inset:0;flex-direction:column;justify-content:center;align-items:flex-start;
+    gap:.15rem;margin:0;padding:5rem var(--okraj) 2rem;background:var(--inkoust);
+    overflow-y:auto;opacity:0;visibility:hidden;
+    transition:opacity .35s var(--prechod),visibility .35s;
+  }
+  .menu.je-otevrene{opacity:1;visibility:visible}
+  .menu a{
+    font-family:var(--ff-nadpis);font-variation-settings:"wdth" 110,"wght" 800;
+    font-size:clamp(1.65rem,7vw,2.5rem);font-weight:800;
+    padding:.3rem 0;opacity:0;transform:translateY(16px);
+  }
+  .menu.je-otevrene a{opacity:1;transform:none;transition:opacity .4s var(--prechod) var(--zp,0s),transform .5s var(--prechod-out) var(--zp,0s)}
+  .menu a::after{left:0;right:auto;width:100%;bottom:.12rem}
+  .hlava__akce .tl--skryt-mobil{display:none}
+}
+@media (max-width:420px){
+  .hlava__jmeno b{font-size:.96rem}
+}
+
+/* ═══════════ 7. ÚVODNÍ OBRAZOVKA ═══════════ */
+.uvod{
+  position:relative;min-height:100vh;min-height:100svh;
+  display:grid;grid-template-rows:1fr auto;isolation:isolate;overflow:clip;
+}
+.uvod__fotky{position:absolute;inset:0;z-index:-2;background:var(--inkoust-2)}
+.uvod__fotky img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  opacity:0;transition:opacity 1.6s var(--prechod);
+}
+.uvod__fotky img.je-videt{opacity:1;animation:pomaluBliz 18s ease-in-out both}
+@keyframes pomaluBliz{from{transform:scale(1.02)}to{transform:scale(1.13)}}
+
+.uvod__zaves{
+  position:absolute;inset:0;z-index:-1;
+  background:
+    linear-gradient(100deg, rgba(7,24,41,.94) 0%, rgba(7,24,41,.74) 36%, rgba(7,24,41,.26) 66%, rgba(7,24,41,.48) 100%),
+    linear-gradient(to bottom, rgba(7,24,41,.7) 0%, rgba(7,24,41,.1) 34%, rgba(7,24,41,.55) 100%);
+}
+.uvod__obsah{
+  width:100%;max-width:var(--max);margin-inline:auto;align-self:end;
+  padding:7.5rem var(--okraj) clamp(2.25rem,4.5vw,3.5rem);
+  color:var(--papir);
+}
+.uvod__titul{margin:1.5rem 0 0;color:#fff;max-width:16ch}
+.uvod__pod{margin-top:1.4rem;max-width:54ch;color:rgba(253,246,233,.93);font-weight:500}
+.uvod__cta{display:flex;flex-wrap:wrap;gap:.7rem;margin-top:2rem}
+.uvod__adresa{
+  margin-top:1.6rem;display:flex;flex-wrap:wrap;gap:.5rem 1.6rem;
+  font-family:var(--ff-data);font-size:.8rem;color:rgba(253,246,233,.74);
+}
+.uvod__adresa span{display:inline-flex;align-items:center;gap:.45rem}
+.uvod__adresa svg{opacity:.8;flex:0 0 auto}
+
+@media (max-height:860px) and (min-width:1101px){
+  .nadpis--obri{font-size:clamp(2.4rem,6vw,4.8rem)}
+  .uvod__obsah{padding-top:6.25rem}
+  .uvod__pod{margin-top:1rem}
+  .uvod__cta{margin-top:1.45rem}
+  .uvod__adresa{margin-top:1.1rem}
+}
+
+/* ═══════════ 8. PRUH „DNES U NÁS" ═══════════ */
+.dnes{position:relative;z-index:2;background:var(--zlata);color:var(--inkoust);border-top:3px solid var(--inkoust)}
+.dnes__mrizka{
+  max-width:var(--max);margin-inline:auto;padding:0 var(--okraj);
+  display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) minmax(0,1.25fr) auto;
+  align-items:stretch;
+}
+.dnes__pole{padding:1.05rem 0;display:flex;flex-direction:column;gap:.2rem;justify-content:center;min-width:0}
+.dnes__pole+.dnes__pole{padding-left:clamp(1rem,3vw,2.5rem);margin-left:clamp(1rem,3vw,2.5rem);border-left:2px solid rgba(14,42,77,.18)}
+.dnes__popis{font-family:var(--ff-data);font-size:.63rem;letter-spacing:.2em;text-transform:uppercase;color:rgba(14,42,77,.7)}
+.dnes__hodnota{
+  font-family:var(--ff-nadpis);font-variation-settings:"wdth" 104,"wght" 760;
+  font-size:clamp(.95rem,1.4vw,1.16rem);font-weight:760;line-height:1.25;
+  display:flex;align-items:center;gap:.5rem;padding-block:.04em .1em;
+}
+.dnes__hodnota small{font-family:var(--ff-text);font-weight:600;font-size:.84em;opacity:.78}
+.tecka{width:9px;height:9px;border-radius:50%;flex:0 0 auto;background:var(--cervena);position:relative}
+.tecka--otevreno{background:var(--zelena);color:var(--zelena)}
+.tecka--otevreno::after{
+  content:"";position:absolute;inset:-5px;border-radius:50%;
+  border:2px solid currentColor;animation:tep 2.4s ease-out infinite;
+}
+@keyframes tep{0%{transform:scale(.55);opacity:.8}100%{transform:scale(1.5);opacity:0}}
+@media (prefers-reduced-motion:reduce){.tecka--otevreno::after{animation:none;opacity:.35}}
+
+.dnes__odkaz{
+  display:inline-flex;align-items:center;gap:.4rem;align-self:center;
+  font-weight:700;font-size:.9rem;color:var(--inkoust);
+  padding:.62rem 1.05rem;border-radius:var(--r);background:rgba(14,42,77,.1);
+  transition:background .25s var(--prechod),color .25s,transform .25s var(--prechod-out);
+  white-space:nowrap;
+}
+.dnes__odkaz:hover{background:var(--inkoust);color:var(--zlata);transform:translateY(-1px)}
+
+@media (max-width:900px){
+  .dnes__mrizka{grid-template-columns:1fr 1fr;gap:0}
+  .dnes__pole+.dnes__pole.dnes__pole--akce{
+    grid-column:1/-1;border-left:0;margin-left:0;padding-left:0;
+    border-top:2px solid rgba(14,42,77,.18);
+  }
+  .dnes__odkaz{grid-column:1/-1;justify-content:center;margin-bottom:1rem}
+}
+@media (max-width:560px){
+  .dnes__mrizka{grid-template-columns:1fr}
+  .dnes__pole+.dnes__pole{border-left:0;margin-left:0;padding-left:0;border-top:2px solid rgba(14,42,77,.18)}
+  .dnes__pole{padding-block:.85rem}
+}
+
+/* ═══════════ 9. BĚŽÍCÍ PÁS ═══════════ */
+.pas{background:var(--modra);color:#fff;padding:.72rem 0;overflow:hidden;position:relative}
+.pas__stopa{display:flex;width:max-content;animation:pasJede var(--pas-doba,36s) linear infinite}
+@keyframes pasJede{from{transform:translate3d(0,0,0)}to{transform:translate3d(-25%,0,0)}}
+.pas:hover .pas__stopa{animation-play-state:paused}
+@media (prefers-reduced-motion:reduce){.pas__stopa{animation:none}}
+.pas__blok{display:flex;align-items:center;gap:2.2rem;padding-right:2.2rem;flex:0 0 auto}
+.pas__blok span{font-family:var(--ff-data);font-size:.76rem;font-weight:500;letter-spacing:.16em;text-transform:uppercase;white-space:nowrap}
+.pas__blok i{width:6px;height:6px;background:var(--zlata);transform:rotate(45deg);flex:0 0 auto}
+
+/* ═══════════ 10. O PODNIKU — fotka až do pravého kraje ═══════════ */
+.opodniku{
+  align-items:center;
+  column-gap:clamp(2rem,5vw,5rem);row-gap:2.5rem;
+  padding-block:var(--sekce-y);
+}
+@media (min-width:980px){
+  .opodniku__text{grid-column:stred-l / span 1;max-width:none}
+  .opodniku{display:grid;grid-template-columns:
+    [kraj-l] minmax(var(--okraj),1fr)
+    [stred-l] minmax(0, calc(var(--max-obsah) * .46))
+    [a] minmax(0, calc(var(--max-obsah) * .54))
+    [stred-p] minmax(var(--okraj),1fr) [kraj-p]}
+  .opodniku__text{grid-column:stred-l / a}
+  .opodniku__foto{grid-column:a / kraj-p}
+  .opodniku__foto img{border-radius:var(--r-velky) 0 0 var(--r-velky)}
+}
+@media (max-width:979px){
+  .opodniku{display:grid;grid-template-columns:
+    [kraj-l] var(--okraj) [stred-l] minmax(0,1fr) [stred-p] var(--okraj) [kraj-p]}
+  .opodniku__text{grid-column:stred-l / stred-p}
+  .opodniku__foto{grid-column:kraj-l / kraj-p}
+  .opodniku__foto img{border-radius:0}
+}
+.opodniku__text p+p{margin-top:1.1rem}
+.opodniku__foto{position:relative}
+.opodniku__foto img{width:100%;aspect-ratio:4/3.2;object-fit:cover;box-shadow:var(--stin-velky)}
+.opodniku__popisek{
+  margin-top:.8rem;padding-inline:var(--okraj);
+  font-family:var(--ff-data);font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--seda);
+}
+@media (min-width:980px){.opodniku__popisek{padding-inline:0}}
+
+.znacka-roh{
+  position:absolute;left:-18px;top:-20px;z-index:2;
+  background:var(--zlata);color:var(--inkoust);padding:.8rem 1.1rem;border-radius:var(--r);
+  font-family:var(--ff-nadpis);font-variation-settings:"wdth" 100,"wght" 780;
+  font-size:.84rem;line-height:1.25;text-align:center;box-shadow:var(--stin);
+  transform:rotate(-3deg);
+}
+.znacka-roh b{display:block;font-size:1.7rem;line-height:1;padding-block:.02em .06em}
+@media (max-width:979px){.znacka-roh{left:var(--okraj);top:-16px}}
+
+.cisla{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:1px;
+  margin-top:clamp(3rem,5vw,4.5rem);background:var(--papir-3);
+  border:1px solid var(--papir-3);border-radius:var(--r-velky);overflow:hidden;
+}
+.cisla li{background:var(--papir);padding:1.5rem 1.2rem}
+.cisla b{
+  display:block;font-family:var(--ff-nadpis);
+  font-variation-settings:"wdth" 112,"wght" 820;
+  font-size:clamp(1.6rem,3.4vw,2.5rem);line-height:1.1;letter-spacing:-.025em;color:var(--modra);
+  padding-block:.03em .08em;
+}
+.cisla span{display:block;margin-top:.35rem;font-family:var(--ff-data);font-size:.66rem;letter-spacing:.13em;text-transform:uppercase;color:var(--seda)}
+@media (max-width:760px){.cisla{grid-template-columns:repeat(2,1fr)}}
+
+/* ═══════════ 11. CELOPLOŠNÝ FOTOPÁS ═══════════ */
+.fotopas{
+  position:relative;overflow:hidden;isolation:isolate;
+  min-height:clamp(320px,46vw,560px);
+  display:grid;align-items:center;
+}
+.fotopas__obraz{
+  position:absolute;inset:-8% 0;z-index:-2;width:100%;height:116%;
+  object-fit:cover;will-change:transform;
+}
+.fotopas::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(94deg, rgba(7,24,41,.93) 0%, rgba(7,24,41,.68) 44%, rgba(7,24,41,.26) 80%);
+}
+.fotopas--zprava::after{
+  background:linear-gradient(266deg, rgba(7,24,41,.93) 0%, rgba(7,24,41,.68) 44%, rgba(7,24,41,.26) 80%);
+}
+.fotopas__obsah{
+  width:100%;max-width:var(--max);margin-inline:auto;
+  padding:clamp(3rem,7vw,5rem) var(--okraj);color:var(--papir);
+}
+.fotopas--zprava .fotopas__obsah{display:flex;justify-content:flex-end;text-align:right}
+.fotopas--zprava .fotopas__text{display:flex;flex-direction:column;align-items:flex-end}
+.fotopas__text{max-width:52ch}
+.fotopas__text .nadpis{max-width:17ch}
+.fotopas__text .nadpis{color:#fff}
+.fotopas__text p{margin-top:1rem;color:rgba(253,246,233,.92);max-width:40ch}
+.fotopas__udaje{
+  display:flex;gap:clamp(1.1rem,2.4vw,2.4rem);margin-top:2rem;flex-wrap:wrap;
+}
+.fotopas__udaj{min-width:0;flex:0 0 auto}
+.fotopas__udaj b{
+  display:block;font-family:var(--ff-nadpis);font-variation-settings:"wdth" 112,"wght" 820;
+  font-size:clamp(1.5rem,3vw,2.2rem);color:var(--zlata);line-height:1.1;padding-block:.03em .08em;
+}
+.fotopas__udaj span{font-family:var(--ff-data);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(253,246,233,.72)}
+/* na širokém displeji necháme polovinu fotky volnou, na mobilu
+   text roztáhneme — fotka je tam stejně pod překryvem */
+@media (min-width:621px){
+  .fotopas__text{max-width:min(52ch, 56vw)}
+  .fotopas__text .nadpis{max-width:min(17ch, 42vw)}
+  .fotopas__text p{max-width:min(40ch, 44vw)}
+}
+@media (max-width:620px){
+  .fotopas--zprava .fotopas__obsah{justify-content:flex-start;text-align:left}
+  .fotopas--zprava .fotopas__text{align-items:flex-start}
+  .fotopas::after,.fotopas--zprava::after{background:linear-gradient(to top, rgba(7,24,41,.94) 10%, rgba(7,24,41,.66) 58%, rgba(7,24,41,.45) 100%)}
+  .fotopas__udaje{gap:1.4rem 2rem}
+}
+
+/* ═══════════ 12. CO U NÁS NAJDETE — fotka v pozadí ═══════════ */
+/* tmavá sekce — barvu textu je nutné nastavit výslovně, jinak nadpisy
+   zdědí tmavou barvu z <body> a na tmavém pozadí zmizí */
+.vybaveni-sekce{position:relative;isolation:isolate;overflow:hidden;background:var(--inkoust);color:var(--papir)}
+.vybaveni-sekce .perex{color:var(--seda-sv)}
+.vybaveni-sekce__pozadi{
+  position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;opacity:.14;
+}
+.vybaveni-sekce::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to bottom, var(--inkoust) 0%, rgba(14,42,77,.93) 26%, rgba(14,42,77,.93) 74%, var(--inkoust) 100%);
+}
+/* přesný počet sloupců místo auto-fit — šest dlaždic se tak vždy
+   rozdělí beze zbytku a nikde nezůstane prázdné místo */
+.vybaveni{display:grid;grid-template-columns:1fr;gap:1px;background:rgba(253,246,233,.18);border-radius:var(--r-velky);overflow:hidden}
+@media (min-width:640px){.vybaveni{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1080px){.vybaveni{grid-template-columns:repeat(3,1fr)}}
+.vybaveni li{background:var(--inkoust);padding:clamp(1.5rem,2.8vw,2.1rem);position:relative;overflow:hidden}
+.vybaveni li::after{
+  content:"";position:absolute;inset:auto 0 0 0;height:3px;background:var(--zlata);
+  transform:scaleX(0);transform-origin:left;transition:transform .45s var(--prechod-out);
+}
+.vybaveni li:hover::after{transform:scaleX(1)}
+.vybaveni svg{width:28px;height:28px;stroke:var(--zlata);fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;margin-bottom:.95rem}
+.vybaveni h3{margin-bottom:.4rem;color:var(--papir)}
+.vybaveni p{font-size:.93rem;color:var(--seda-sv);line-height:1.56}
+
+/* ═══════════ 13. TÝDENNÍ MENU ═══════════ */
+.tyden{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,215px),1fr));gap:clamp(.7rem,1.3vw,1.1rem)}
+.den{
+  background:var(--papir);border:1px solid var(--papir-3);border-radius:var(--r-velky);
+  padding:1.35rem 1.3rem;display:flex;flex-direction:column;gap:.85rem;
+  transition:transform .4s var(--prechod-out),box-shadow .4s var(--prechod),border-color .3s;
+}
+.den:hover{transform:translateY(-4px);box-shadow:var(--stin)}
+.den.je-dnes{border-color:var(--cervena);border-width:2px;box-shadow:0 0 0 4px rgba(192,57,43,.1)}
+.den__hlava{display:flex;align-items:baseline;justify-content:space-between;gap:.6rem;border-bottom:2px solid var(--papir-3);padding-bottom:.6rem}
+.den__nazev{font-family:var(--ff-nadpis);font-variation-settings:"wdth" 104,"wght" 780;font-size:1.1rem;padding-block:.03em .1em}
+.den__dnes{font-family:var(--ff-data);font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cervena);font-weight:500}
+.den__polevka{font-size:.88rem;color:var(--seda);display:flex;gap:.5rem;align-items:flex-start;padding-bottom:.7rem;border-bottom:1px dashed var(--papir-3)}
+.den__polevka b{font-family:var(--ff-data);font-size:.6rem;letter-spacing:.14em;text-transform:uppercase;color:var(--modra);flex:0 0 auto;padding-top:.2em}
+.den__jidla{display:flex;flex-direction:column;gap:.7rem}
+.den__jidlo{display:grid;grid-template-columns:1fr auto;gap:.25rem .7rem;align-items:baseline}
+.den__jidlo span{font-weight:600;font-size:.95rem;line-height:1.4}
+.den__jidlo b{font-family:var(--ff-data);font-size:.88rem;font-weight:500;color:var(--modra);white-space:nowrap;letter-spacing:-.04em}
+.den__jidlo small{grid-column:1/-1;font-size:.82rem;color:var(--seda);line-height:1.45}
+.den__prazdno{font-size:.88rem;color:var(--seda);font-style:italic}
+
+.prazdno{padding:clamp(2rem,4vw,3rem);text-align:center;border:2px dashed var(--papir-3);border-radius:var(--r-velky);color:var(--seda)}
+.prazdno p{max-width:46ch;margin-inline:auto}
+.prazdno .tl{margin-top:1.4rem}
+
+/* ═══════════ 14. STÁLÝ LÍSTEK ═══════════ */
+.zalozky{display:flex;flex-wrap:wrap;gap:.45rem;margin-bottom:clamp(1.75rem,3vw,2.5rem)}
+.zalozky button{
+  padding:.58rem 1.1rem;border-radius:99px;font-size:.85rem;font-weight:600;
+  background:var(--papir);box-shadow:inset 0 0 0 1.5px var(--papir-3);color:var(--seda);
+  transition:all .28s var(--prechod);
+}
+.zalozky button:hover{box-shadow:inset 0 0 0 1.5px var(--modra);color:var(--modra)}
+.zalozky button[aria-selected="true"]{background:var(--modra);color:#fff;box-shadow:none}
+
+.chody{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:0 clamp(2rem,4.5vw,4.5rem)}
+.chod{display:grid;grid-template-columns:1fr auto;gap:.2rem .9rem;align-items:baseline;padding:1rem 0;border-bottom:1px dashed var(--papir-3)}
+.chod__nazev{font-weight:700;font-size:1.03rem;line-height:1.35}
+.chod__cena{font-family:var(--ff-data);font-size:.95rem;font-weight:500;color:var(--modra);white-space:nowrap;letter-spacing:-.04em}
+.chod__popis{grid-column:1/-1;font-size:.88rem;color:var(--seda);line-height:1.5;max-width:54ch}
+.listek__pozn{margin-top:clamp(1.75rem,3vw,2.5rem);padding-top:1.3rem;border-top:2px solid var(--papir-3);font-size:.86rem;color:var(--seda);display:flex;flex-wrap:wrap;gap:.5rem 2rem}
+
+/* ═══════════ 15. AKCE ═══════════ */
+.akce-sekce{position:relative;isolation:isolate;overflow:hidden}
+.akce-sekce__pozadi{position:absolute;inset:0;z-index:-2;width:100%;height:100%;object-fit:cover;opacity:.13}
+.akce-sekce::after{
+  content:"";position:absolute;inset:0;z-index:-1;
+  background:linear-gradient(to bottom, var(--inkoust) 0%, rgba(14,42,77,.93) 24%, rgba(14,42,77,.93) 76%, var(--inkoust) 100%);
+}
+.akce{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:clamp(1rem,2vw,1.7rem)}
+.akce-karta{
+  background:var(--papir);border-radius:var(--r-velky);overflow:hidden;
+  box-shadow:var(--stin);display:flex;flex-direction:column;
+  transition:transform .42s var(--prechod-out),box-shadow .42s var(--prechod);
+  /* karta je světlá uvnitř tmavé sekce — barvu textu nastavujeme výslovně */
+  color:var(--inkoust);
+}
+.akce-karta:hover{transform:translateY(-5px);box-shadow:var(--stin-velky)}
+.akce-karta__datum{background:var(--modra);color:#fff;padding:.9rem 1.35rem;display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap}
+.akce-karta__datum b{font-family:var(--ff-nadpis);font-variation-settings:"wdth" 108,"wght" 800;font-size:1.2rem;padding-block:.03em .1em}
+.akce-karta__datum span{font-family:var(--ff-data);font-size:.76rem;color:var(--zlata-hi)}
+.akce-karta__telo{padding:1.35rem;display:flex;flex-direction:column;gap:.6rem;flex:1}
+.akce-karta__telo p{font-size:.94rem;color:var(--seda);line-height:1.55}
+
+/* ═══════════ 16. GALERIE — mřížka přes celou šířku ═══════════
+   Dlaždic je deset (devět fotek a jedna výzva), takže počet sloupců
+   volíme tak, aby řádky vždy vyšly beze zbytku: 1, 2 nebo 5.          */
+.galerie{
+  display:grid;grid-template-columns:1fr;
+  gap:clamp(.4rem,.7vw,.7rem);margin-top:clamp(2rem,4vw,3rem);
+}
+@media (min-width:560px){.galerie{grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1000px){.galerie{grid-template-columns:repeat(5,1fr)}}
+.galerie button,.galerie__vyzva{
+  position:relative;display:block;width:100%;aspect-ratio:4/5;
+  overflow:hidden;background:var(--inkoust-2);
+}
+@media (max-width:560px){.galerie button,.galerie__vyzva{aspect-ratio:4/3}}
+
+/* desátá dlaždice — zlatá výzva, ať mřížka vychází a zároveň
+   na konci galerie něco nabídneme */
+.galerie__vyzva{
+  background:var(--zlata);color:var(--inkoust);
+  display:flex;flex-direction:column;justify-content:center;gap:.7rem;
+  padding:clamp(1.2rem,2vw,1.8rem);text-align:left;
+  transition:background .3s var(--prechod);
+}
+.galerie__vyzva:hover{background:var(--zlata-hi)}
+.galerie__vyzva b{
+  font-family:var(--ff-nadpis);font-variation-settings:"wdth" 106,"wght" 790;
+  font-size:clamp(1.1rem,1.6vw,1.34rem);line-height:1.15;padding-block:.03em .09em;
+}
+.galerie__vyzva span{font-size:.88rem;line-height:1.45;opacity:.82}
+.galerie__vyzva svg{margin-top:auto}
+.galerie img{width:100%;height:100%;object-fit:cover;transition:transform .9s var(--prechod-out)}
+.galerie button::after{
+  content:"";position:absolute;inset:0;background:linear-gradient(to top,rgba(7,24,41,.6),transparent 52%);
+  opacity:.7;transition:opacity .4s var(--prechod);
+}
+.galerie button:hover img,.galerie button:focus-visible img{transform:scale(1.07)}
+.galerie button:hover::after,.galerie button:focus-visible::after{opacity:.95}
+.galerie__popis{position:absolute;left:0;right:0;bottom:0;z-index:2;padding:.9rem 1rem;font-family:var(--ff-data);font-size:.72rem;letter-spacing:.06em;color:#fff;text-align:left}
+
+.svetlo{position:fixed;inset:0;z-index:200;display:none;place-items:center;background:rgba(7,24,41,.97);padding:clamp(1rem,4vw,3rem)}
+.svetlo[open]{display:grid}
+.svetlo img{max-width:100%;max-height:78svh;max-height:78vh;object-fit:contain;border-radius:var(--r)}
+.svetlo__popis{position:absolute;left:0;right:0;bottom:calc(clamp(1rem,3vw,2rem) + 64px);text-align:center;font-family:var(--ff-data);font-size:.76rem;color:var(--seda-sv);padding-inline:1rem}
+.svetlo__ovl{position:absolute;inset:auto 0 clamp(1rem,3vw,2rem) 0;display:flex;justify-content:center;gap:.7rem}
+.svetlo__ovl button,.svetlo__x{width:48px;height:48px;display:grid;place-items:center;border-radius:50%;color:var(--papir);box-shadow:inset 0 0 0 2px rgba(253,246,233,.3);transition:all .28s var(--prechod)}
+.svetlo__ovl button:hover,.svetlo__x:hover{background:var(--zlata);color:var(--inkoust);box-shadow:none}
+.svetlo__x{position:absolute;top:clamp(1rem,3vw,2rem);right:clamp(1rem,3vw,2rem)}
+
+/* ═══════════ 17. OSLAVY — fotka až do levého kraje ═══════════ */
+.oslavy{align-items:center;column-gap:clamp(2rem,5vw,5rem);row-gap:2.5rem;padding-block:var(--sekce-y)}
+@media (min-width:980px){
+  .oslavy{display:grid;grid-template-columns:
+    [kraj-l] minmax(var(--okraj),1fr)
+    [a] minmax(0, calc(var(--max-obsah) * .5))
+    [stred-l] minmax(0, calc(var(--max-obsah) * .5))
+    [stred-p] minmax(var(--okraj),1fr) [kraj-p]}
+  .oslavy__foto{grid-column:kraj-l / stred-l;grid-row:1}
+  .oslavy__text{grid-column:stred-l / stred-p;grid-row:1}
+  .oslavy__foto img{border-radius:0 var(--r-velky) var(--r-velky) 0}
+}
+@media (max-width:979px){
+  .oslavy{display:grid;grid-template-columns:
+    [kraj-l] var(--okraj) [stred-l] minmax(0,1fr) [stred-p] var(--okraj) [kraj-p]}
+  .oslavy__text{grid-column:stred-l / stred-p}
+  .oslavy__foto{grid-column:kraj-l / kraj-p;order:-1}
+}
+.oslavy__foto img{width:100%;aspect-ratio:4/3.4;object-fit:cover;box-shadow:var(--stin-velky)}
+.kroky{margin-top:2rem;display:grid;gap:1.1rem}
+.krok{display:grid;grid-template-columns:auto 1fr;gap:1rem;align-items:start}
+.krok b{width:34px;height:34px;flex:0 0 auto;border-radius:50%;background:var(--zlata);color:var(--inkoust);display:grid;place-items:center;font-family:var(--ff-data);font-size:.86rem;font-weight:500}
+.krok p{font-size:.98rem;line-height:1.55}
+
+/* ═══════════ 18. KONTAKT ═══════════ */
+.kontakt{display:grid;grid-template-columns:.95fr 1.05fr;gap:clamp(2rem,4.5vw,4.5rem);align-items:start}
+@media (max-width:920px){.kontakt{grid-template-columns:1fr}}
+
+.telefony{display:grid;gap:.85rem;margin-top:1.75rem}
+.telefon{
+  display:grid;grid-template-columns:1fr auto;gap:.55rem 1rem;align-items:center;
+  padding:1.1rem 1.25rem;border-radius:var(--r-velky);
+  background:var(--papir);border:1px solid var(--papir-3);
+  transition:border-color .3s var(--prechod),box-shadow .3s var(--prechod);
+}
+.telefon:hover{border-color:var(--modra);box-shadow:var(--stin)}
+.telefon__kdo{font-family:var(--ff-data);font-size:.63rem;letter-spacing:.16em;text-transform:uppercase;color:var(--seda)}
+.telefon__cislo{
+  display:block;font-family:var(--ff-nadpis);font-variation-settings:"wdth" 104,"wght" 780;
+  font-size:clamp(1.16rem,2.2vw,1.46rem);font-weight:780;color:var(--inkoust);
+  padding-block:.03em .08em;letter-spacing:-.005em;
+}
+.telefon__cislo:hover{color:var(--modra)}
+.telefon__wa{display:inline-flex;align-items:center;gap:.45rem;padding:.62rem 1rem;border-radius:var(--r);background:var(--whatsapp);color:#fff;font-weight:700;font-size:.85rem;white-space:nowrap;transition:background .25s var(--prechod),transform .25s var(--prechod-out)}
+.telefon__wa:hover{background:var(--whatsapp-hi);transform:translateY(-1px)}
+@media (max-width:420px){
+  .telefon{grid-template-columns:1fr}
+  .telefon__wa{justify-content:center}
+}
+
+.udaje{display:grid;gap:1.3rem;margin-top:1.75rem}
+.udaje dt{font-family:var(--ff-data);font-size:.63rem;letter-spacing:.17em;text-transform:uppercase;color:var(--seda);margin-bottom:.28rem}
+.udaje dd{font-size:1.02rem;line-height:1.5}
+.udaje a{border-bottom:2px solid var(--papir-3);transition:border-color .25s,color .25s}
+.udaje a:hover{color:var(--modra);border-color:var(--modra)}
+
+.hodiny{width:100%;margin-top:.5rem}
+.hodiny th,.hodiny td{padding:.46rem 0;text-align:left;font-size:.95rem;border-bottom:1px solid var(--papir-3)}
+.hodiny th{font-weight:600;color:var(--seda)}
+.hodiny td{font-family:var(--ff-data);font-size:.88rem;text-align:right}
+.hodiny tr.hodiny__dnes th{color:var(--cervena);font-weight:700}
+.hodiny tr.hodiny__dnes td{color:var(--cervena)}
+
+.mapa{position:relative;aspect-ratio:4/3;border-radius:var(--r-velky);overflow:hidden;background:var(--papir-2);border:1px solid var(--papir-3)}
+.mapa iframe{width:100%;height:100%;border:0}
+.mapa__spust{position:absolute;inset:0;display:grid;place-items:center;gap:.9rem;text-align:center;padding:2rem;background:var(--papir-2)}
+.mapa__spust p{font-size:.9rem;color:var(--seda);max-width:34ch}
+
+/* ═══════════ 19. PATIČKA ═══════════ */
+.pata{background:var(--inkoust);color:var(--seda-sv);padding-top:clamp(3.25rem,6vw,5rem)}
+.pata__mrizka{display:grid;grid-template-columns:1.5fr 1fr 1fr;gap:clamp(1.75rem,4vw,3.5rem);padding-bottom:2.75rem}
+@media (max-width:860px){.pata__mrizka{grid-template-columns:1fr 1fr}}
+@media (max-width:520px){.pata__mrizka{grid-template-columns:1fr}}
+.pata .pata__nadpis{font-family:var(--ff-data);font-size:.63rem;font-weight:500;letter-spacing:.18em;text-transform:uppercase;color:var(--zlata);margin-bottom:.95rem}
+.pata li+li{margin-top:.45rem}
+.pata a{font-size:.94rem;transition:color .25s var(--prechod)}
+.pata a:hover{color:var(--papir)}
+.pata__spodek{border-top:1px solid rgba(253,246,233,.12);padding:1.35rem 0 2.25rem;display:flex;justify-content:space-between;gap:1rem 2rem;flex-wrap:wrap;font-family:var(--ff-data);font-size:.7rem;color:rgba(175,192,207,.75)}
+.pata__spodek a{font-size:.7rem}
+
+/* ═══════════ 20. SPODNÍ LIŠTA NA MOBILU ═══════════ */
+.lista{
+  position:fixed;left:0;right:0;bottom:0;z-index:85;display:none;
+  grid-template-columns:1fr 1fr;gap:1px;background:rgba(7,24,41,.2);
+  padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -6px 24px rgba(7,24,41,.22);
+}
+.lista a{display:flex;align-items:center;justify-content:center;gap:.5rem;padding:.95rem .6rem;font-weight:700;font-size:.92rem;background:var(--modra);color:#fff}
+.lista a.wa{background:var(--whatsapp)}
+@media (max-width:760px){
+  .lista{display:grid}
+  body{padding-bottom:3.6rem}
+  .nahoru{bottom:4.6rem}
+}
+
+.nahoru{
+  position:fixed;right:var(--okraj);bottom:1.5rem;z-index:80;
+  width:48px;height:48px;display:grid;place-items:center;border-radius:50%;
+  background:var(--zlata);color:var(--inkoust);box-shadow:var(--stin);
+  opacity:0;pointer-events:none;transform:scale(.6);
+  transition:opacity .35s var(--prechod),transform .4s var(--prechod-out);
+}
+.nahoru.je-videt{opacity:1;pointer-events:auto;transform:none}
+
+/* ═══════════ 21. KDYŽ SE FOTKA NENAČTE ═══════════
+   Místo prázdného rámečku ukážeme, co je špatně. Na hotovém webu se
+   tohle nikdy neobjeví — pomůže to jen při nasazování, když se vedle
+   index.html nedostane složka fotky.                                  */
+/* Zdvojená třída zvyšuje váhu pravidla — jinak by hlášku přebil
+   překryv, který mají dlaždice v galerii.                            */
+.chybi-fotka.chybi-fotka{
+  position:relative;min-height:130px;
+  background:repeating-linear-gradient(45deg,
+    var(--papir-2) 0 14px, var(--papir-3) 14px 28px);
+}
+.chybi-fotka.chybi-fotka::after{
+  /* text se liší podle toho, jestli je stránka na webu, nebo otevřená
+     ze souboru — nastavuje ho skript do proměnné --hlaska-fotka */
+  content:var(--hlaska-fotka,"Fotka se nenačetla. Zkontrolujte, že je vedle index.html složka „fotky“.");
+  position:absolute;inset:0;z-index:3;display:flex;align-items:center;justify-content:center;
+  padding:1.1rem;text-align:center;opacity:1;
+  font-family:var(--ff-data);font-size:.72rem;line-height:1.6;letter-spacing:.03em;
+  color:var(--cervena);background:rgba(253,246,233,.94);
+}
+.chybi-fotka.chybi-fotka img{visibility:hidden}
+.chybi-fotka.chybi-fotka .galerie__popis{display:none}
+
+/* ═══════════ 22. ANIMACE PŘI ROLOVÁNÍ ═══════════
+   POZOR na háčky a písmena pod linkou (j, y, g, p, ů, ě).
+   Maskovací obal musí mít místo nahoře i dole, jinak se diakritika
+   ořízne. Odsazení se vyruší záporným okrajem, takže se rozvržení
+   nehne, a text se posouvá o 145 %, aby byl v klidu opravdu schovaný. */
+[data-nalet]{opacity:0;transform:translateY(24px);transition:opacity .8s var(--prechod-out),transform .9s var(--prechod-out)}
+[data-nalet].je-videt{opacity:1;transform:none}
+[data-nalet="zleva"]{transform:translateX(-26px)}
+[data-nalet="zleva"].je-videt{transform:none}
+[data-nalet="zprava"]{transform:translateX(26px)}
+[data-nalet="zprava"].je-videt{transform:none}
+[data-nalet="skala"]{transform:scale(.95)}
+[data-nalet="skala"].je-videt{transform:none}
+
+.radek{
+  display:block;overflow:hidden;
+  padding-top:.18em;padding-bottom:.28em;
+  margin-top:-.18em;margin-bottom:-.28em;
+}
+.radek>span{display:block;transform:translateY(145%)}
+
+.slovo{
+  display:inline-block;overflow:hidden;vertical-align:bottom;
+  padding:.16em .04em .3em;margin:-.16em -.04em -.3em;
+}
+.slovo>span{display:inline-block;transform:translateY(145%)}
+.je-videt .slovo>span{transform:none}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms!important;animation-iteration-count:1!important;
+    transition-duration:.001ms!important;
+  }
+  [data-nalet]{opacity:1!important;transform:none!important}
+  .radek>span,.slovo>span{transform:none!important}
+  .uvod__fotky img.je-videt{animation:none}
+  .fotopas__obraz{transform:none!important}
+}
+</style>
+</head>
+
+<body>
+
+<a class="preskocit" href="#obsah">Přeskočit na obsah</a>
+
+<!-- ─────────── HLAVIČKA ─────────── -->
+<header class="hlava" id="hlava">
+  <a class="hlava__znacka" href="#nahore" aria-label="Restaurace U Kapalínů, domů">
+    <span class="hlava__znak" aria-hidden="true">K</span>
+    <span class="hlava__jmeno">
+      <b>U&nbsp;Kapalínů</b>
+      <span>Sobín · Praha 17</span>
+    </span>
+  </a>
+
+  <nav class="menu" id="menu" aria-label="Hlavní navigace">
+    <a href="#podnik">Hospoda</a>
+    <a href="#menu-tydne">Polední menu</a>
+    <a href="#listek">Jídelní lístek</a>
+    <a href="#akce">Akce</a>
+    <a href="#galerie">Fotky</a>
+    <a href="#oslavy">Oslavy</a>
+    <a href="#kontakt">Kontakt</a>
+  </nav>
+
+  <div class="hlava__akce">
+    <a class="tl tl--whatsapp tl--skryt-mobil" href="https://wa.me/420603857142" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+      WhatsApp
+    </a>
+    <button class="burger" id="burger" aria-expanded="false" aria-controls="menu" aria-label="Otevřít menu">
+      <i></i><i></i><i></i>
+    </button>
+  </div>
+</header>
+
+<main id="obsah">
+
+<!-- ─────────── ÚVODNÍ OBRAZOVKA ─────────── -->
+<section class="uvod" id="nahore">
+  <div class="uvod__fotky" aria-hidden="true">
+    <img src="fotky/hero-zahradka.jpg" alt="" class="je-videt" fetchpriority="high" decoding="async" width="1920" height="1080">
+    <img data-src="fotky/hero-hriste.jpg" alt="" decoding="async" width="1530" height="861">
+    <img data-src="fotky/hero-lokal.jpg" alt="" decoding="async" width="1536" height="864">
+  </div>
+  <div class="uvod__zaves"></div>
+
+  <div class="uvod__obsah">
+    <p class="stitek stitek--svetly">Hostivická&nbsp;8/10 &nbsp;·&nbsp; Sobín, Praha&nbsp;17</p>
+
+    <h1 class="nadpis nadpis--obri uvod__titul" id="uvodTitul">
+      <span class="radek"><span>Česká hospoda</span></span>
+      <span class="radek"><span>v Sobíně</span></span>
+    </h1>
+
+    <p class="perex uvod__pod">
+      Zahrádka s dětským hřištěm, velké parkoviště, sportovní přenosy na televizi
+      a kuchyně, která vaří poctivou českou klasiku. Deset minut od Zličína.
+    </p>
+
+    <div class="uvod__cta">
+      <a class="tl tl--whatsapp tl--velke" href="https://wa.me/420603857142?text=Dobr%C3%BD%20den%2C%20r%C3%A1d%20bych%20u%20v%C3%A1s%20rezervoval%20st%C5%AFl." target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+        Rezervovat přes WhatsApp
+      </a>
+      <a class="tl tl--duch-svetly tl--velke" href="#listek">Jídelní lístek</a>
+    </div>
+
+    <p class="uvod__adresa">
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+        Hostivická 8/10, Praha 17
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+        Po–pá 10–22 &nbsp;·&nbsp; So–ne 10:30–22
+      </span>
+      <span>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 17V7a2 2 0 0 1 2-2h9l6 4v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="8" cy="19" r="1.6"/><circle cx="17" cy="19" r="1.6"/></svg>
+        Parkování zdarma
+      </span>
+    </p>
+  </div>
+
+  <!-- ★ PODPISOVÝ PRVEK: tři věci, které host opravdu řeší -->
+  <div class="dnes" id="dnesPruh">
+    <div class="dnes__mrizka">
+      <div class="dnes__pole">
+        <span class="dnes__popis">Právě teď</span>
+        <span class="dnes__hodnota" id="dnesStav"><span class="tecka" aria-hidden="true"></span><span id="dnesStavText">Načítám…</span></span>
+      </div>
+      <div class="dnes__pole">
+        <span class="dnes__popis" id="dnesObedPopis">Dnešní menu</span>
+        <span class="dnes__hodnota" id="dnesObed">Načítám…</span>
+      </div>
+      <div class="dnes__pole dnes__pole--akce">
+        <span class="dnes__popis">Nejbližší akce</span>
+        <span class="dnes__hodnota" id="dnesAkce">Načítám…</span>
+      </div>
+      <a class="dnes__odkaz" href="#menu-tydne">
+        Celé menu
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── BĚŽÍCÍ PÁS ─────────── -->
+<div class="pas" aria-hidden="true">
+  <div class="pas__stopa" id="pasStopa">
+    <div class="pas__blok">
+      <span>Klasická česká hospoda</span><i></i>
+      <span>Zahrádka</span><i></i>
+      <span>Dětské hřiště</span><i></i>
+      <span>Velké parkoviště</span><i></i>
+      <span>Sportovní přenosy</span><i></i>
+      <span>Oslavy a rauty</span><i></i>
+      <span>Salonek</span><i></i>
+      <span>Jídlo s sebou</span><i></i>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────── O PODNIKU — fotka jde až do pravého kraje ─────────── -->
+<section class="opodniku" id="podnik">
+  <div class="opodniku__text" data-nalet="zleva">
+    <p class="stitek" style="margin-bottom:1.1rem">O hospodě</p>
+    <h2 class="nadpis nadpis--velky" data-rozdelit>Hospoda, jaká má být</h2>
+    <div style="margin-top:1.6rem">
+      <p class="perex">
+        Jsme klasická česká hospoda na okraji Prahy. Točíme Staropramen,
+        vaříme českou kuchyni a nikdo vás od stolu nehoní. Uvnitř je lokál,
+        vedle salonek pro větší společnosti, venku zahrádka s grilem
+        a dětským hřištěm na dohled od stolů.
+      </p>
+      <p class="perex" style="margin-top:1.05rem">
+        Parkoviště máme vlastní a velké, takže se k nám dá bez problémů
+        přijet autem i s přívěsem. Sportovní přenosy pouštíme na televizi
+        v lokále — na zápas si u nás klidně zarezervujte stůl dopředu.
+      </p>
+    </div>
+    <div style="margin-top:2rem;display:flex;gap:.7rem;flex-wrap:wrap">
+      <a class="tl" href="#listek">Jídelní lístek</a>
+      <a class="tl tl--duch" href="#kontakt">Kudy k nám</a>
+    </div>
+  </div>
+
+  <figure class="opodniku__foto" data-nalet="zprava">
+    <img src="fotky/lokal-sud.jpg" alt="Lokál restaurace U Kapalínů s dřevěným obložením, dlouhým stolem a televizí" width="1125" height="1500" loading="lazy" decoding="async">
+    <div class="znacka-roh" aria-hidden="true">Kapacita<b>40</b>míst v lokále</div>
+    <figcaption class="opodniku__popisek">Lokál — televize, dřevo, klid</figcaption>
+  </figure>
+</section>
+
+<!-- ─────────── FOTOPÁS: ZAHRÁDKA ─────────── -->
+<section class="fotopas" aria-labelledby="pasZahradkaNadpis">
+  <img class="fotopas__obraz" data-parallax src="fotky/pas-zahradka.jpg"
+       alt="Zahrádka restaurace U Kapalínů plná hostů pod slunečníky" width="1920" height="823" loading="lazy" decoding="async">
+  <div class="fotopas__obsah">
+    <div class="fotopas__text" data-nalet>
+      <p class="stitek stitek--svetly" style="margin-bottom:1.1rem">Venku</p>
+      <h2 class="nadpis nadpis--stredni" id="pasZahradkaNadpis" data-rozdelit>Zahrádka, ze které se nikam nespěchá</h2>
+      <p>Stíněné stoly, gril, hřiště na dohled a parkoviště hned vedle.
+         Od jara do podzimu nejlepší místo v podniku.</p>
+      <div class="fotopas__udaje">
+        <div class="fotopas__udaj"><b>Gril</b><span>Venkovní</span></div>
+        <div class="fotopas__udaj"><b>Hřiště</b><span>Na dohled od stolu</span></div>
+        <div class="fotopas__udaj"><b>Zdarma</b><span>Parkování</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── CO U NÁS NAJDETE — fotka v pozadí ─────────── -->
+<section class="sekce vybaveni-sekce" aria-labelledby="vybaveniNadpis">
+  <img class="vybaveni-sekce__pozadi" src="fotky/pozadi-vycep.jpg" alt="" aria-hidden="true" width="1536" height="864" loading="lazy" decoding="async">
+  <div class="obal">
+    <div class="hlavicka-sekce" data-nalet>
+      <p class="stitek stitek--svetly">Co u nás najdete</p>
+      <h2 class="nadpis nadpis--velky" id="vybaveniNadpis" data-rozdelit>Proč k nám lidé jezdí</h2>
+    </div>
+
+    <ul class="vybaveni" data-nalet>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12l-1 8a5 5 0 0 1-10 0L6 3Z"/><path d="M18 6h2a2 2 0 0 1 0 4h-2"/><path d="M8 21h8"/><path d="M12 16v5"/></svg>
+        <h3 class="nadpis nadpis--maly">Klasická česká hospoda</h3>
+        <p>Staropramen na čepu, česká kuchyně, dřevěný lokál. Bez zbytečných vylepšení.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 17V7a2 2 0 0 1 2-2h9l6 4v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/><circle cx="8" cy="19" r="1.8"/><circle cx="17" cy="19" r="1.8"/></svg>
+        <h3 class="nadpis nadpis--maly">Velké parkoviště</h3>
+        <p>Vlastní parkovací plocha přímo u podniku, zdarma. Žádné modré zóny ani hledání místa.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 21V9l8-5 8 5v12"/><path d="M4 13h16"/><path d="M9 21v-5h6v5"/></svg>
+        <h3 class="nadpis nadpis--maly">Dětské hřiště</h3>
+        <p>Prolézačka se skluzavkou hned u zahrádky, na dohled od stolů. Děti si hrají, vy v klidu dojíte.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c1.6 2.6.6 4.2-.5 5.8S10 12.4 12 14.5c2-2.1 1.5-4.2.5-5.8"/><path d="M5 14.5a7 7 0 0 0 14 0"/><path d="M4 21h16"/></svg>
+        <h3 class="nadpis nadpis--maly">Zahrádka s grilem</h3>
+        <p>Velká venkovní zahrádka pod slunečníky. Od jara do podzimu nejlepší místo v podniku.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="5" width="20" height="13" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/><path d="M7 10.5 11 13l-4 2.5Z"/></svg>
+        <h3 class="nadpis nadpis--maly">Sportovní přenosy</h3>
+        <p>Televize v lokále. Na větší zápasy doporučujeme stůl zarezervovat dopředu.</p>
+      </li>
+      <li>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v4"/><path d="M8 7h8l1.5 4.5a6 6 0 0 1-11 0L8 7Z"/><path d="M5 21h14"/><path d="M9 21c0-2 1.5-3.5 3-3.5s3 1.5 3 3.5"/></svg>
+        <h3 class="nadpis nadpis--maly">Oslavy a rauty</h3>
+        <p>Salonek i celý podnik pro soukromé akce. Domluvíme menu, termín i obsluhu.</p>
+      </li>
+    </ul>
+  </div>
+</section>
+
+<!-- ─────────── TÝDENNÍ MENU ─────────── -->
+<section class="sekce" id="menu-tydne">
+  <div class="obal">
+    <div class="hlavicka-sekce hlavicka-sekce--rada" data-nalet>
+      <div>
+        <p class="stitek" style="margin-bottom:1.1rem">Každý týden jiné</p>
+        <h2 class="nadpis nadpis--velky" data-rozdelit>Polední menu</h2>
+      </div>
+      <p class="data" id="tydenPlatnost" style="color:var(--seda);text-align:right;max-width:30ch"></p>
+    </div>
+
+    <div class="tyden" id="tydenObsah"></div>
+    <p class="data" id="tydenPoznamka" style="margin-top:1.6rem;color:var(--seda)"></p>
+  </div>
+</section>
+
+<!-- ─────────── STÁLÝ JÍDELNÍ LÍSTEK ─────────── -->
+<section class="sekce sekce--krem" id="listek">
+  <div class="obal">
+    <div class="hlavicka-sekce" data-nalet>
+      <p class="stitek">Vaříme po celý den</p>
+      <h2 class="nadpis nadpis--velky" data-rozdelit>Stálý jídelní lístek</h2>
+      <p class="perex">
+        Minutky, speciality kuchyně, saláty i bezmasá jídla. Všechno čerstvé
+        a připravené až na objednávku.
+      </p>
+    </div>
+
+    <div class="zalozky" id="zalozky" role="tablist" aria-label="Kategorie jídelního lístku"></div>
+    <div class="chody" id="chody" role="tabpanel" aria-label="Položky jídelního lístku"></div>
+    <p class="listek__pozn" id="listekPozn"></p>
+  </div>
+</section>
+
+<!-- ─────────── FOTOPÁS: VÝČEP ─────────── -->
+<section class="fotopas fotopas--zprava" aria-labelledby="pasSudNadpis">
+  <img class="fotopas__obraz" data-parallax src="fotky/pas-sud.jpg"
+       alt="Staropramenský sud na stěně lokálu nad dřevěným obložením" width="1920" height="823" loading="lazy" decoding="async">
+  <div class="fotopas__obsah">
+    <div class="fotopas__text" data-nalet>
+      <p class="stitek stitek--svetly" style="margin-bottom:1.1rem">Od výčepu</p>
+      <h2 class="nadpis nadpis--stredni" id="pasSudNadpis" data-rozdelit>Staropramen na čepu</h2>
+      <p>K tomu nealko, káva a panáky. Pivo točíme pomalu, protože jinak
+         to nemá cenu.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── AKCE ─────────── -->
+<section class="sekce sekce--tmava akce-sekce" id="akce">
+  <img class="akce-sekce__pozadi" src="fotky/pas-hudba.jpg" alt="" aria-hidden="true" width="1530" height="656" loading="lazy" decoding="async">
+  <div class="obal">
+    <div class="hlavicka-sekce" data-nalet>
+      <p class="stitek">Co se u nás chystá</p>
+      <h2 class="nadpis nadpis--velky" data-rozdelit>Akce</h2>
+      <p class="perex">
+        Živá hudba na zahrádce, sportovní přenosy, sezónní akce. Termíny
+        najdete tady i na našem Facebooku.
+      </p>
+    </div>
+    <div id="akceObsah"></div>
+  </div>
+</section>
+
+<!-- ─────────── GALERIE — mřížka přes celou šířku ─────────── -->
+<section class="sekce mrizka" id="galerie" style="padding-bottom:0">
+  <div class="hlavicka-sekce hlavicka-sekce--rada" data-nalet>
+    <div>
+      <p class="stitek">Jak to u nás vypadá</p>
+      <h2 class="nadpis nadpis--velky" data-rozdelit>Fotky z hospody</h2>
+    </div>
+    <p class="data" style="color:var(--seda)">Klepnutím zvětšíte</p>
+  </div>
+  <div class="galerie do-kraje" id="galerieMrizka" data-nalet></div>
+</section>
+
+<!-- ─────────── OSLAVY — fotka jde až do levého kraje ─────────── -->
+<section class="oslavy sekce--krem" id="oslavy">
+  <figure class="oslavy__foto" data-nalet="zleva">
+    <img src="fotky/salonek.jpg" alt="Salonek restaurace U Kapalínů prostřený pro větší společnost" width="1125" height="1500" loading="lazy" decoding="async">
+  </figure>
+
+  <div class="oslavy__text" data-nalet="zprava">
+    <p class="stitek" style="margin-bottom:1.1rem">Na objednávku</p>
+    <h2 class="nadpis nadpis--velky" data-rozdelit>Oslavy, rauty a firemní akce</h2>
+    <p class="perex" style="margin-top:1.5rem">
+      V lokále je 40 míst, k tomu salonek a v létě zahrádka. Narozeniny,
+      křtiny, firemní večírek nebo smuteční hostina — domluvíme menu,
+      termín i to, jestli chcete podnik jen pro sebe.
+    </p>
+
+    <div class="kroky">
+      <div class="krok"><b>1</b><p>Napište na WhatsApp nebo zavolejte. Stačí termín a přibližný počet lidí.</p></div>
+      <div class="krok"><b>2</b><p>Domluvíme menu, čas a prostor — salonek, lokál nebo celá hospoda.</p></div>
+      <div class="krok"><b>3</b><p>Přijedete a už se o nic nestaráte.</p></div>
+    </div>
+
+    <div style="margin-top:2.1rem;display:flex;gap:.7rem;flex-wrap:wrap">
+      <a class="tl tl--whatsapp tl--velke" href="https://wa.me/420776224351?text=Dobr%C3%BD%20den%2C%20r%C3%A1d%20bych%20u%20v%C3%A1s%20domluvil%20oslavu." target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+        Domluvit akci
+      </a>
+      <a class="tl tl--duch tl--velke" href="tel:+420776224351">Zavolat provozní</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─────────── KONTAKT ─────────── -->
+<section class="sekce" id="kontakt">
+  <div class="obal">
+    <div class="kontakt">
+      <div data-nalet="zleva">
+        <p class="stitek" style="margin-bottom:1.1rem">Ozvěte se</p>
+        <h2 class="nadpis nadpis--velky" data-rozdelit>Nejradši máme WhatsApp</h2>
+        <p class="perex" style="margin-top:1.3rem">
+          Napsat se dá kdykoliv a my se ozveme, jakmile to v provozu jde.
+          Telefon samozřejmě funguje taky.
+        </p>
+
+        <div class="telefony">
+          <div class="telefon">
+            <div>
+              <span class="telefon__kdo">Jaromír Šťastný — majitel</span>
+              <a class="telefon__cislo" href="tel:+420603857142">603 857 142</a>
+            </div>
+            <a class="telefon__wa" href="https://wa.me/420603857142" target="_blank" rel="noopener" aria-label="Napsat Jaromíru Šťastnému na WhatsApp">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+
+          <div class="telefon">
+            <div>
+              <span class="telefon__kdo">Provozní</span>
+              <a class="telefon__cislo" href="tel:+420776224351">776 224 351</a>
+            </div>
+            <a class="telefon__wa" href="https://wa.me/420776224351" target="_blank" rel="noopener" aria-label="Napsat provozní na WhatsApp">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+              WhatsApp
+            </a>
+          </div>
+        </div>
+
+        <dl class="udaje">
+          <div>
+            <dt>E-mail</dt>
+            <dd><a href="mailto:ukapalinu@seznam.cz">ukapalinu@seznam.cz</a></dd>
+          </div>
+          <div>
+            <dt>Adresa</dt>
+            <dd>Hostivická 8/10<br>Sobín, Praha 17</dd>
+          </div>
+          <div>
+            <dt>Otevírací doba</dt>
+            <dd>
+              <table class="hodiny" id="hodiny">
+                <caption class="jen-ctecka">Otevírací doba podle dnů v týdnu</caption>
+                <tbody>
+                  <tr data-den="1"><th scope="row">Pondělí</th><td>10:00–22:00</td></tr>
+                  <tr data-den="2"><th scope="row">Úterý</th><td>10:00–22:00</td></tr>
+                  <tr data-den="3"><th scope="row">Středa</th><td>10:00–22:00</td></tr>
+                  <tr data-den="4"><th scope="row">Čtvrtek</th><td>10:00–22:00</td></tr>
+                  <tr data-den="5"><th scope="row">Pátek</th><td>10:00–22:00</td></tr>
+                  <tr data-den="6"><th scope="row">Sobota</th><td>10:30–22:00</td></tr>
+                  <tr data-den="0"><th scope="row">Neděle</th><td>10:30–22:00</td></tr>
+                </tbody>
+              </table>
+            </dd>
+          </div>
+        </dl>
+      </div>
+
+      <div data-nalet="skala">
+        <div class="mapa" id="mapa">
+          <div class="mapa__spust" id="mapaSpust">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="var(--modra)" stroke-width="1.6" aria-hidden="true"><path d="M21 10c0 6-9 12-9 12s-9-6-9-12a9 9 0 0 1 18 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+            <p>Mapa se načte až po klepnutí — ať se stránka otevírá rychle.</p>
+            <button class="tl" type="button">Zobrazit mapu</button>
+          </div>
+        </div>
+        <div style="margin-top:.9rem;display:flex;gap:.7rem;flex-wrap:wrap">
+          <a class="tl" href="https://www.google.com/maps/dir/?api=1&amp;destination=Restaurace+U+Kapal%C3%ADn%C5%AF%2C+Hostivick%C3%A1+8%2F10%2C+Praha" target="_blank" rel="noopener">Navigovat</a>
+          <a class="tl tl--duch" href="https://www.facebook.com/p/Restaurace-u-Kapal%C3%ADn%C5%AF-100066951035384/" target="_blank" rel="noopener">Facebook</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ─────────── PATIČKA ─────────── -->
+<footer class="pata">
+  <div class="obal">
+    <div class="pata__mrizka">
+      <div>
+        <div class="hlava__znacka" style="margin-bottom:1.1rem">
+          <span class="hlava__znak" aria-hidden="true">K</span>
+          <span class="hlava__jmeno"><b style="font-size:1.3rem">U&nbsp;Kapalínů</b><span>Sobín · Praha 17</span></span>
+        </div>
+        <p style="font-size:.94rem;max-width:34ch">
+          Klasická česká hospoda se zahrádkou, dětským hřištěm a velkým
+          parkovištěm na okraji Prahy.
+        </p>
+        <p class="data" style="color:var(--zlata);margin-top:1.2rem">
+          Po–pá 10:00–22:00<br>So–ne 10:30–22:00
+        </p>
+      </div>
+
+      <div>
+        <h3 class="pata__nadpis">Na stránce</h3>
+        <ul>
+          <li><a href="#podnik">O hospodě</a></li>
+          <li><a href="#menu-tydne">Polední menu</a></li>
+          <li><a href="#listek">Jídelní lístek</a></li>
+          <li><a href="#akce">Akce</a></li>
+          <li><a href="#galerie">Fotky</a></li>
+          <li><a href="#oslavy">Oslavy a rauty</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <h3 class="pata__nadpis">Kontakt</h3>
+        <ul>
+          <li><a href="https://wa.me/420603857142" target="_blank" rel="noopener">WhatsApp 603 857 142</a></li>
+          <li><a href="tel:+420603857142">603 857 142 — majitel</a></li>
+          <li><a href="tel:+420776224351">776 224 351 — provozní</a></li>
+          <li><a href="mailto:ukapalinu@seznam.cz">ukapalinu@seznam.cz</a></li>
+          <li><a href="https://www.facebook.com/p/Restaurace-u-Kapal%C3%ADn%C5%AF-100066951035384/" target="_blank" rel="noopener">Facebook</a></li>
+          <li style="margin-top:.9rem;font-size:.94rem">Hostivická 8/10<br>Sobín, Praha 17</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="pata__spodek">
+      <span>&copy; <span id="rok">2026</span> Restaurace U Kapalínů &nbsp;·&nbsp; IČO 04874986</span>
+      <span>Parkování zdarma &nbsp;·&nbsp; <a href="/admin">Správa obsahu</a></span>
+    </div>
+  </div>
+</footer>
+
+<div class="lista" aria-label="Rychlý kontakt">
+  <a class="wa" href="https://wa.me/420603857142?text=Dobr%C3%BD%20den%2C" target="_blank" rel="noopener">
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>
+    WhatsApp
+  </a>
+  <a href="tel:+420603857142">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2Z"/></svg>
+    Zavolat
+  </a>
+</div>
+
+<button class="nahoru" id="nahoru" aria-label="Zpět nahoru">
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19V5M5 12l7-7 7 7"/></svg>
+</button>
+
+<div class="svetlo" id="svetlo" role="dialog" aria-modal="true" aria-label="Prohlížeč fotek">
+  <button class="svetlo__x" id="svetloX" aria-label="Zavřít">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg>
+  </button>
+  <img id="svetloObraz" src="" alt="">
+  <p class="svetlo__popis" id="svetloPopis"></p>
+  <div class="svetlo__ovl">
+    <button id="svetloZpet" aria-label="Předchozí fotka">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6"/></svg>
+    </button>
+    <button id="svetloVpred" aria-label="Další fotka">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════ STRUKTUROVANÁ DATA PRO GOOGLE ═══════════════ -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Restaurant",
+      "@id": "https://www.ukapalinu.cz/#restaurace",
+      "name": "Restaurace U Kapalínů",
+      "alternateName": "U Kapalínů",
+      "description": "Klasická česká hospoda v Sobíně na okraji Prahy. Zahrádka s dětským hřištěm, velké parkoviště zdarma, sportovní přenosy na televizi, salonek pro oslavy a rauty.",
+      "url": "https://www.ukapalinu.cz/",
+      "telephone": "+420603857142",
+      "email": "ukapalinu@seznam.cz",
+      "priceRange": "100–200 Kč",
+      "currenciesAccepted": "CZK",
+      "servesCuisine": ["Česká kuchyně", "Minutky", "Grilované speciality"],
+      "image": ["https://www.ukapalinu.cz/fotky/hero-zahradka.jpg"],
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "Hostivická 8/10",
+        "addressLocality": "Praha",
+        "addressRegion": "Praha",
+        "addressCountry": "CZ"
+      },
+      "geo": { "@type": "GeoCoordinates", "latitude": 50.063812, "longitude": 14.270812 },
+      "hasMap": "https://www.google.com/maps/search/?api=1&query=Restaurace+U+Kapal%C3%ADn%C5%AF+Hostivick%C3%A1+Praha",
+      "openingHoursSpecification": [
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday"], "opens": "10:00", "closes": "22:00" },
+        { "@type": "OpeningHoursSpecification", "dayOfWeek": ["Saturday","Sunday"], "opens": "10:30", "closes": "22:00" }
+      ],
+      "amenityFeature": [
+        {"@type":"LocationFeatureSpecification","name":"Zahrádka","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Dětské hřiště","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Parkování zdarma","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Sportovní přenosy na televizi","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Salonek","value":true},
+        {"@type":"LocationFeatureSpecification","name":"Jídlo s sebou","value":true}
+      ],
+      "acceptsReservations": "https://wa.me/420603857142",
+      "sameAs": ["https://www.facebook.com/p/Restaurace-u-Kapal%C3%ADn%C5%AF-100066951035384/"],
+      "areaServed": ["Sobín","Praha 17","Zličín","Řepy","Stodůlky","Hostivice","Praha 6"],
+      "founder": { "@type": "Person", "name": "Jaromír Šťastný" }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://www.ukapalinu.cz/#web",
+      "url": "https://www.ukapalinu.cz/",
+      "name": "Restaurace U Kapalínů",
+      "inLanguage": "cs-CZ",
+      "publisher": { "@id": "https://www.ukapalinu.cz/#restaurace" }
+    }
+  ]
+}
+</script>
+
+<script src="obsah-vychozi.js"></script>
+<script>
+(function(){
+'use strict';
+
+const $  = (s,k=document)=>k.querySelector(s);
+const $$ = (s,k=document)=>[...k.querySelectorAll(s)];
+const klid = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* ── ochrana proti vložení HTML z administrace ───────────────────── */
+function bezpecne(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, z =>
+    ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[z]));
+}
+
+/* ── otevírací doba ──────────────────────────────────────────────── */
+/* ‼️ UPRAVIT, kdyby se změnila otevírací doba (0 = neděle)           */
+const DOBA = {
+  0:{od:10.5, do:22}, 1:{od:10, do:22}, 2:{od:10, do:22}, 3:{od:10, do:22},
+  4:{od:10, do:22},   5:{od:10, do:22}, 6:{od:10.5, do:22}
+};
+const DNY_NAZVY = ['Neděle','Pondělí','Úterý','Středa','Čtvrtek','Pátek','Sobota'];
+const MESICE = ['ledna','února','března','dubna','května','června','července','srpna','září','října','listopadu','prosince'];
+
+function hodinaNaText(h){
+  const cele = Math.floor(h), min = Math.round((h - cele) * 60);
+  return cele + ':' + String(min).padStart(2,'0');
+}
+
+/* ── data z administrace ─────────────────────────────────────────── */
+let DATA = (typeof OBSAH_VYCHOZI !== 'undefined')
+  ? JSON.parse(JSON.stringify(OBSAH_VYCHOZI))
+  : { tydenni:{platnost:'',poznamka:'',dny:[]}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]} };
+
+function nactiData(){
+  return fetch('/api/data', {cache:'no-store'})
+    .then(o => o.ok ? o.json() : Promise.reject(o.status))
+    .then(d => {
+      if(d && typeof d === 'object'){
+        if(d.tydenni) DATA.tydenni = d.tydenni;
+        if(d.stale)   DATA.stale   = d.stale;
+        if(d.akce)    DATA.akce    = d.akce;
+      }
+    })
+    .catch(() => { /* web běží i bez serveru — ukáže se výchozí obsah */ });
+}
+
+function cenaText(c){
+  const t = String(c).trim();
+  if(!t) return '';
+  return /[a-zA-ZčČ]/.test(t) ? t : t + ' Kč';
+}
+
+/* ═══════════ VYKRESLENÍ: TÝDENNÍ MENU ═══════════ */
+function vykresliTyden(){
+  const box = $('#tydenObsah');
+  const t = DATA.tydenni || {};
+  const dny = Array.isArray(t.dny) ? t.dny : [];
+  const maObsah = dny.some(d => (d.jidla && d.jidla.length) || d.polevka);
+
+  $('#tydenPlatnost').textContent = t.platnost || '';
+  $('#tydenPoznamka').textContent = maObsah ? (t.poznamka || '') : '';
+
+  if(!maObsah){
+    box.className = '';
+    box.innerHTML =
+      '<div class="prazdno">' +
+      '<h3 class="nadpis nadpis--maly" style="margin-bottom:.6rem">Polední menu právě připravujeme</h3>' +
+      '<p>Aktuální nabídku vám rádi řekneme po telefonu nebo na WhatsApp. ' +
+      'Stálý jídelní lístek najdete níž na stránce.</p>' +
+      '<a class="tl tl--whatsapp" href="https://wa.me/420603857142?text=Dobr%C3%BD%20den%2C%20jak%C3%A9%20m%C3%A1te%20dnes%20poledn%C3%AD%20menu%3F" target="_blank" rel="noopener">Zeptat se na WhatsApp</a>' +
+      '</div>';
+    return;
+  }
+
+  const dnesNazev = DNY_NAZVY[new Date().getDay()];
+  box.className = 'tyden';
+  box.innerHTML = dny.map(d => {
+    const jeDnes = (d.den || '').trim().toLowerCase() === dnesNazev.toLowerCase();
+    const jidla = Array.isArray(d.jidla) ? d.jidla : [];
+    return '<article class="den' + (jeDnes ? ' je-dnes' : '') + '">' +
+      '<div class="den__hlava">' +
+        '<h3 class="den__nazev">' + bezpecne(d.den) + '</h3>' +
+        (jeDnes ? '<span class="den__dnes">Dnes</span>' : '') +
+      '</div>' +
+      (d.polevka ? '<p class="den__polevka"><b>Polévka</b><span>' + bezpecne(d.polevka) + '</span></p>' : '') +
+      (jidla.length
+        ? '<div class="den__jidla">' + jidla.map(j =>
+            '<div class="den__jidlo">' +
+              '<span>' + bezpecne(j.nazev) + '</span>' +
+              '<b>' + bezpecne(cenaText(j.cena)) + '</b>' +
+              (j.popis ? '<small>' + bezpecne(j.popis) + '</small>' : '') +
+            '</div>').join('') + '</div>'
+        : '<p class="den__prazdno">Menu zveřejníme brzy.</p>') +
+    '</article>';
+  }).join('');
+}
+
+/* ═══════════ VYKRESLENÍ: STÁLÝ LÍSTEK ═══════════ */
+let aktivniKat = 0;
+
+function vykresliListek(){
+  const kat = (DATA.stale && Array.isArray(DATA.stale.kategorie)) ? DATA.stale.kategorie : [];
+  const zal = $('#zalozky'), chody = $('#chody');
+  $('#listekPozn').textContent = (DATA.stale && DATA.stale.poznamka) || '';
+
+  if(!kat.length){
+    zal.innerHTML = '';
+    chody.className = '';
+    chody.innerHTML = '<div class="prazdno"><p>Jídelní lístek právě aktualizujeme. ' +
+      'Zavolejte nám na 603 857 142 a rádi vám poradíme.</p></div>';
+    return;
+  }
+  if(aktivniKat >= kat.length) aktivniKat = 0;
+
+  zal.innerHTML = kat.map((k,i) =>
+    '<button type="button" role="tab" aria-selected="' + (i === aktivniKat) + '">' +
+    bezpecne(k.nazev) + '</button>').join('');
+
+  $$('#zalozky button').forEach((b,i) => b.addEventListener('click', () => {
+    aktivniKat = i;
+    $$('#zalozky button').forEach((x,j) => x.setAttribute('aria-selected', String(j === i)));
+    vykresliChody();
+  }));
+
+  vykresliChody();
+}
+
+function vykresliChody(){
+  const kat = DATA.stale.kategorie[aktivniKat];
+  const chody = $('#chody');
+  chody.className = 'chody';
+  const pol = (kat && Array.isArray(kat.polozky)) ? kat.polozky : [];
+  chody.innerHTML = pol.map(p =>
+    '<article class="chod">' +
+      '<h3 class="chod__nazev">' + bezpecne(p.nazev) + '</h3>' +
+      '<span class="chod__cena">' + bezpecne(cenaText(p.cena)) + '</span>' +
+      (p.popis ? '<p class="chod__popis">' + bezpecne(p.popis) + '</p>' : '') +
+    '</article>').join('');
+
+  if(klid) return;
+  $$('.chod', chody).forEach((el,i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity .45s ease, transform .55s cubic-bezier(.16,1,.3,1)';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    }, 20 + i * 28);
+  });
+}
+
+/* ═══════════ VYKRESLENÍ: AKCE ═══════════ */
+function formatDatum(iso){
+  if(!iso) return '';
+  const d = new Date(iso + 'T00:00:00');
+  if(isNaN(d)) return iso;
+  return d.getDate() + '. ' + MESICE[d.getMonth()];
+}
+function denVTydnu(iso){
+  if(!iso) return '';
+  const d = new Date(iso + 'T00:00:00');
+  return isNaN(d) ? '' : DNY_NAZVY[d.getDay()];
+}
+
+function budouciAkce(){
+  const a = (DATA.akce && Array.isArray(DATA.akce.polozky)) ? DATA.akce.polozky : [];
+  const dnes = new Date(); dnes.setHours(0,0,0,0);
+  return a
+    .filter(x => x && x.nazev)
+    .filter(x => {
+      if(!x.datum) return true;                 /* akce bez data = stálá */
+      const d = new Date(x.datum + 'T00:00:00');
+      return isNaN(d) || d >= dnes;
+    })
+    .sort((x,y) => (x.datum || '9999').localeCompare(y.datum || '9999'));
+}
+
+function vykresliAkce(){
+  const box = $('#akceObsah');
+  const polozky = budouciAkce();
+
+  if(!polozky.length){
+    box.className = '';
+    box.innerHTML = '<div class="prazdno" style="border-color:rgba(253,246,233,.25);color:var(--seda-sv)">' +
+      '<p>' + bezpecne((DATA.akce && DATA.akce.prazdnyText) ||
+        'Momentálně žádné akce nepořádáme. Jakmile budeme něco chystat, najdete to tady.') + '</p>' +
+      '<a class="tl tl--duch-svetly" href="https://www.facebook.com/p/Restaurace-u-Kapal%C3%ADn%C5%AF-100066951035384/" target="_blank" rel="noopener">Sledovat na Facebooku</a>' +
+      '</div>';
+    return;
+  }
+
+  box.className = 'akce';
+  box.innerHTML = polozky.map(a =>
+    '<article class="akce-karta">' +
+      '<div class="akce-karta__datum">' +
+        '<b>' + bezpecne(a.datum ? formatDatum(a.datum) : 'Průběžně') + '</b>' +
+        '<span>' + bezpecne([denVTydnu(a.datum), a.cas].filter(Boolean).join(' · ')) + '</span>' +
+      '</div>' +
+      '<div class="akce-karta__telo">' +
+        '<h3 class="nadpis nadpis--maly">' + bezpecne(a.nazev) + '</h3>' +
+        (a.popis ? '<p>' + bezpecne(a.popis) + '</p>' : '') +
+      '</div>' +
+    '</article>').join('');
+}
+
+/* ═══════════ PRUH „DNES U NÁS" ═══════════ */
+function vykresliDnes(){
+  const ted = new Date();
+  const den = ted.getDay();
+  const h = ted.getHours() + ted.getMinutes() / 60;
+  const d = DOBA[den];
+  const otevreno = h >= d.od && h < d.do;
+
+  const tecka = $('#dnesStav .tecka');
+  tecka.className = 'tecka' + (otevreno ? ' tecka--otevreno' : '');
+
+  let text;
+  if(otevreno){
+    const zbyva = d.do - h;
+    text = zbyva <= 1
+      ? 'Otevřeno · zavíráme za ' + Math.max(1, Math.round(zbyva * 60)) + ' min'
+      : 'Otevřeno do ' + hodinaNaText(d.do);
+  } else if(h < d.od){
+    text = 'Zavřeno · otevíráme v ' + hodinaNaText(d.od);
+  } else {
+    const zitra = DOBA[(den + 1) % 7];
+    text = 'Zavřeno · zítra od ' + hodinaNaText(zitra.od);
+  }
+  $('#dnesStavText').textContent = text;
+
+  /* dnešní polední menu */
+  const dnesNazev = DNY_NAZVY[den];
+  const dnyMenu = (DATA.tydenni && Array.isArray(DATA.tydenni.dny)) ? DATA.tydenni.dny : [];
+  const dnesMenu = dnyMenu.find(x => (x.den || '').trim().toLowerCase() === dnesNazev.toLowerCase());
+  const obed = $('#dnesObed');
+  $('#dnesObedPopis').textContent = 'Dnešní menu · ' + dnesNazev.toLowerCase();
+
+  if(dnesMenu && dnesMenu.jidla && dnesMenu.jidla.length){
+    const prvni = dnesMenu.jidla[0];
+    const dalsi = dnesMenu.jidla.length - 1;
+    obed.innerHTML = bezpecne(prvni.nazev) +
+      (dalsi > 0 ? ' <small>a další ' + dalsi + '</small>' : '');
+  } else if(den === 0 || den === 6){
+    obed.innerHTML = '<small>O víkendu vaříme ze stálého lístku</small>';
+  } else {
+    obed.innerHTML = '<small>Zeptejte se nás na WhatsApp</small>';
+  }
+
+  /* nejbližší akce */
+  const akce = budouciAkce();
+  const boxA = $('#dnesAkce');
+  if(akce.length){
+    const a = akce[0];
+    boxA.innerHTML = bezpecne(a.nazev) +
+      (a.datum ? ' <small>' + bezpecne(formatDatum(a.datum)) + '</small>' : '');
+  } else {
+    boxA.innerHTML = '<small>Nic se zrovna nechystá</small>';
+  }
+
+  const radek = $('#hodiny tr[data-den="' + den + '"]');
+  if(radek) radek.classList.add('hodiny__dnes');
+}
+
+/* ═══════════ HLÍDÁNÍ FOTEK ═══════════
+   Prohlížeč běžně přeruší stahování obrázku, když uživatel rychle
+   projede kolem. Vypadá to jako chyba, ale není — proto se stažení
+   potichu několikrát zopakuje, a to na pomocném obrázku stranou,
+   takže ten na stránce nikdy neblikne ani nezmizí.
+
+   Hláška „fotka se nenačetla" se ukáže, až když selžou aspoň TŘI
+   fotky naráz — to znamená chybějící složku „fotky". U jedné dvou se
+   zkouší potichu dál asi minutu a teprve pak se to vzdá. Pozadí sekcí
+   a fotky v úvodu se hláškou nepřekrývají nikdy.
+
+   Když se uživatel vrátí k oknu nebo se obnoví připojení, dostanou
+   neúspěšné fotky další šanci.                                       */
+(function hlidejFotky(){
+  const POKUSU = 5;      /* kolikrát stažení potichu zopakujeme */
+  const MEZ    = 3;      /* kolik fotek musí selhat, než se ukáže hláška */
+
+  /* Ze souboru na disku bývá na vině chybějící složka, na webu spojení. */
+  if(location.protocol !== 'file:')
+    document.documentElement.style.setProperty('--hlaska-fotka',
+      '"Fotku se nepodařilo stáhnout. Zkuste prosím obnovit stránku."');
+
+  const pokusy  = new WeakMap();
+  const cekaji  = new WeakSet();     /* o tyhle se právě pokoušíme */
+  const selhale = new Set();
+  const vzdane  = new WeakSet();     /* ani po minutě se nenačetly */
+  let nahlaseno = false;
+
+  const jePozadi = img => img.matches(
+    '.uvod__fotky img, .fotopas__obraz, .vybaveni-sekce__pozadi, .akce-sekce__pozadi');
+
+  const ramecek = img => img.closest('figure, .galerie button, .opodniku__foto, .oslavy__foto');
+
+  function prekresli(){
+    const hromadne = selhale.size >= MEZ;
+    selhale.forEach(img => {
+      if(jePozadi(img)) return;
+      const ram = ramecek(img);
+      if(ram) ram.classList.toggle('chybi-fotka', hromadne || vzdane.has(img));
+    });
+    if(hromadne && !nahlaseno){
+      nahlaseno = true;
+      console.warn('[U Kapalínů] Nepodařilo se načíst ' + selhale.size +
+        ' fotek. Zkontrolujte, že je vedle index.html složka „fotky".');
+    }
+    doklepavat();
+  }
+
+  /* Když zůstane viset jedna dvě fotky, je to skoro vždycky přerušené
+     stahování — zkoušíme to na pozadí dál, pomalu, zhruba minutu.
+     Když jich selže hodně najednou, nemá to smysl: složka prostě chybí. */
+  let dotep = null, kol = 0, uzNeklepat = false;
+  function doklepavat(){
+    if(dotep || uzNeklepat || !selhale.size || selhale.size >= MEZ) return;
+    kol = 0;
+    dotep = setInterval(() => {
+      if(!selhale.size || selhale.size >= MEZ){ clearInterval(dotep); dotep = null; return; }
+      if(++kol > 10){
+        clearInterval(dotep); dotep = null;
+        uzNeklepat = true;
+        selhale.forEach(img => vzdane.add(img));
+        prekresli();
+        return;
+      }
+      dalsiKolo();
+    }, 6000);
+  }
+
+  function zkusit(img){
+    const url = img.getAttribute('src');
+    if(!url || cekaji.has(img)) return;
+    const n = (pokusy.get(img) || 0) + 1;
+    pokusy.set(img, n);
+    cekaji.add(img);
+
+    setTimeout(() => {
+      if(img.complete && img.naturalWidth > 0){ cekaji.delete(img); return; }
+      const pomocny = new Image();
+      pomocny.onload = () => {
+        cekaji.delete(img);
+        /* soubor je teď v mezipaměti, přiřazení naskočí okamžitě.
+           Počítadlo schválně nenulujeme — kdyby se i tohle přiřazení
+           nepovedlo, nesmí se z toho stát nekonečné kolečko.         */
+        img.removeAttribute('src');
+        img.setAttribute('src', url);
+      };
+      pomocny.onerror = () => {
+        cekaji.delete(img);
+        if(n < POKUSU){ zkusit(img); return; }
+        selhale.add(img);
+        prekresli();
+      };
+      pomocny.src = url;
+    }, Math.min(400 * n, 4000));
+  }
+
+  function selhalo(img){
+    if(selhale.has(img)) return;      /* už to vzdal, čeká na další kolo */
+    zkusit(img);
+  }
+
+  function uspelo(img){
+    pokusy.delete(img);
+    vzdane.delete(img);
+    const ram = ramecek(img);
+    if(ram) ram.classList.remove('chybi-fotka');
+    if(selhale.delete(img)) prekresli();
+  }
+
+  /* Návrat k oknu nebo obnovené připojení = ještě jeden pokus. */
+  function dalsiKolo(){
+    if(!selhale.size) return;
+    const kolo = [...selhale];
+    selhale.clear();
+    kolo.forEach(img => {
+      vzdane.delete(img);
+      const ram = ramecek(img);
+      if(ram) ram.classList.remove('chybi-fotka');
+      pokusy.set(img, POKUSU - 1);
+      zkusit(img);
+    });
+  }
+
+  document.addEventListener('error', e => {
+    if(e.target && e.target.tagName === 'IMG') selhalo(e.target);
+  }, true);
+  document.addEventListener('load', e => {
+    if(e.target && e.target.tagName === 'IMG') uspelo(e.target);
+  }, true);
+
+  function zkusitZnovuRucne(){ uzNeklepat = false; dalsiKolo(); }
+  addEventListener('online', zkusitZnovuRucne);
+  addEventListener('focus', zkusitZnovuRucne);
+  document.addEventListener('visibilitychange', () => { if(!document.hidden) zkusitZnovuRucne(); });
+})();
+
+/* ═══════════ GALERIE ═══════════ */
+const FOTKY = [
+  { s:'zahradka-hriste',    p:'Zahrádka s dětským hřištěm' },
+  { s:'akce-zahradka-lide', p:'Zahrádka při akci' },
+  { s:'vycep',              p:'Výčep' },
+  { s:'lokal-sud',          p:'Lokál s televizí' },
+  { s:'akce-ziva-hudba',    p:'Živá hudba na zahrádce' },
+  { s:'salonek',            p:'Salonek pro větší společnosti' },
+  { s:'staropramen-sud',    p:'Staropramen na čepu' },
+  { s:'lokal-pohary',       p:'Lokál a vitrína s poháry' },
+  { s:'akce-kapela',        p:'Kapela na zahrádce' }
+];
+
+function vykresliGalerii(){
+  const dlazdice = FOTKY.map((f,i) =>
+    '<button type="button" data-i="' + i + '" ' +
+      'aria-label="Zvětšit fotku: ' + bezpecne(f.p) + '">' +
+      '<img src="fotky/' + f.s + '-nahled.jpg" alt="' + bezpecne(f.p) + ' — Restaurace U Kapalínů" loading="lazy" decoding="async">' +
+      '<span class="galerie__popis">' + bezpecne(f.p) + '</span>' +
+    '</button>').join('');
+
+  /* desátá dlaždice doplní mřížku a zároveň nabídne rezervaci */
+  const vyzva =
+    '<a class="galerie__vyzva" href="https://wa.me/420603857142?text=Dobr%C3%BD%20den%2C%20r%C3%A1d%20bych%20u%20v%C3%A1s%20rezervoval%20st%C5%AFl." target="_blank" rel="noopener">' +
+      '<b>Nejlepší je přijet</b>' +
+      '<span>Stůl si zamluvte na WhatsApp nebo telefonem. Těšíme se.</span>' +
+      '<svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.5 14.4c-.3-.2-1.8-.9-2-1-.3-.1-.5-.2-.7.1-.2.3-.7 1-.9 1.2-.2.2-.3.2-.6.1-.3-.2-1.3-.5-2.4-1.5-.9-.8-1.5-1.8-1.7-2.1-.2-.3 0-.5.1-.6l.5-.5c.1-.2.2-.3.3-.5 0-.2 0-.4 0-.5 0-.2-.7-1.6-.9-2.2-.2-.6-.5-.5-.7-.5h-.6c-.2 0-.5.1-.8.4-.3.3-1 1-1 2.5s1.1 2.9 1.2 3.1c.1.2 2.1 3.2 5 4.4.7.3 1.2.5 1.7.6.7.2 1.3.2 1.8.1.6-.1 1.8-.7 2-1.4.2-.7.2-1.3.2-1.4-.1-.2-.3-.2-.5-.3Z"/><path d="M12 2a10 10 0 0 0-8.6 15L2 22l5.2-1.4A10 10 0 1 0 12 2Zm0 18.2a8.2 8.2 0 0 1-4.2-1.1l-.3-.2-3.1.8.8-3-.2-.3A8.2 8.2 0 1 1 12 20.2Z"/></svg>' +
+    '</a>';
+
+  $('#galerieMrizka').innerHTML = dlazdice + vyzva;
+}
+
+let svIndex = 0, svFokus = null;
+const svetlo = $('#svetlo'), svObraz = $('#svetloObraz'), svPopis = $('#svetloPopis');
+
+function svUkaz(i){
+  svIndex = (i + FOTKY.length) % FOTKY.length;
+  const f = FOTKY[svIndex];
+  svObraz.src = 'fotky/' + f.s + '.jpg';
+  svObraz.alt = f.p + ' — Restaurace U Kapalínů';
+  svPopis.textContent = f.p + ' · ' + (svIndex + 1) + ' / ' + FOTKY.length;
+}
+function svOtevri(i){
+  svFokus = document.activeElement;
+  svUkaz(i);
+  svetlo.setAttribute('open','');
+  document.body.classList.add('je-zamknute');
+  $('#svetloX').focus();
+}
+function svZavri(){
+  svetlo.removeAttribute('open');
+  document.body.classList.remove('je-zamknute');
+  if(svFokus) svFokus.focus();
+}
+
+/* ═══════════ ANIMACE ═══════════ */
+function rozdelNadpisy(){
+  if(klid) return;
+  $$('[data-rozdelit]').forEach(el => {
+    const slova = el.textContent.trim().split(/\s+/);
+    el.textContent = '';
+    slova.forEach((s,i) => {
+      const obal = document.createElement('span');
+      obal.className = 'slovo';
+      const vnitrek = document.createElement('span');
+      vnitrek.textContent = s;
+      vnitrek.style.transitionDelay = (i * 0.05) + 's';
+      vnitrek.style.transition = 'transform .85s cubic-bezier(.16,1,.3,1)';
+      obal.appendChild(vnitrek);
+      el.appendChild(obal);
+      if(i < slova.length - 1) el.appendChild(document.createTextNode(' '));
+    });
+    if(!el.hasAttribute('data-nalet')) el.setAttribute('data-nalet','');
+  });
+}
+
+function spustNalety(){
+  const io = new IntersectionObserver(zaznamy => {
+    zaznamy.forEach(z => {
+      if(z.isIntersecting){ z.target.classList.add('je-videt'); io.unobserve(z.target); }
+    });
+  }, { threshold:.1, rootMargin:'0px 0px -6% 0px' });
+  $$('[data-nalet]').forEach(el => io.observe(el));
+}
+
+function spustTitulek(){
+  $$('#uvodTitul .radek > span').forEach((r,i) => {
+    if(klid){ r.style.transform = 'none'; return; }
+    r.style.transition = 'transform 1.05s cubic-bezier(.16,1,.3,1) ' + (0.1 + i * 0.1) + 's';
+    requestAnimationFrame(() => requestAnimationFrame(() => { r.style.transform = 'none'; }));
+  });
+}
+
+/* ═══════════ ROLOVÁNÍ ═══════════
+   Smyčka běží jen při rolování a pak usne — žádné nekonečné
+   překreslování na pozadí.                                          */
+const hlava = $('#hlava'), tlNahoru = $('#nahoru');
+const odkazyMenu = $$('#menu a');
+const parallax = $$('[data-parallax]');
+let naplanovano = false, vyskaOkna = window.innerHeight;
+
+function priRolovani(){
+  naplanovano = false;
+  const y = window.scrollY;
+  hlava.classList.toggle('je-prilepena', y > 50);
+  tlNahoru.classList.toggle('je-videt', y > vyskaOkna * 1.1);
+
+  if(klid) return;
+  /* fotopásy se posouvají o kousek pomaleji než stránka */
+  parallax.forEach(el => {
+    const r = el.parentElement.getBoundingClientRect();
+    if(r.bottom < -100 || r.top > vyskaOkna + 100) return;
+    const p = (r.top + r.height / 2 - vyskaOkna / 2) / vyskaOkna;   /* -1 … 1 */
+    el.style.transform = 'translate3d(0,' + (p * -5.5).toFixed(2) + '%,0)';
+  });
+}
+function naplanuj(){ if(!naplanovano){ naplanovano = true; requestAnimationFrame(priRolovani); } }
+
+window.addEventListener('scroll', naplanuj, {passive:true});
+window.addEventListener('resize', () => { vyskaOkna = window.innerHeight; naplanuj(); }, {passive:true});
+
+/* zvýraznění aktivní položky v navigaci */
+const sekce = odkazyMenu.map(a => $(a.getAttribute('href'))).filter(Boolean);
+if(sekce.length){
+  const ioS = new IntersectionObserver(zaznamy => {
+    zaznamy.forEach(z => {
+      if(!z.isIntersecting) return;
+      odkazyMenu.forEach(a => a.classList.toggle('je-tady', a.getAttribute('href') === '#' + z.target.id));
+    });
+  }, { rootMargin:'-45% 0px -50% 0px' });
+  sekce.forEach(s => ioS.observe(s));
+}
+
+/* mobilní menu */
+const burger = $('#burger'), menuEl = $('#menu');
+burger.addEventListener('click', () => {
+  const otevrene = menuEl.classList.toggle('je-otevrene');
+  burger.setAttribute('aria-expanded', String(otevrene));
+  burger.setAttribute('aria-label', otevrene ? 'Zavřít menu' : 'Otevřít menu');
+  document.body.classList.toggle('je-zamknute', otevrene);
+  odkazyMenu.forEach((a,i) => a.style.setProperty('--zp', (0.05 * i + 0.1) + 's'));
+});
+odkazyMenu.forEach(a => a.addEventListener('click', () => {
+  menuEl.classList.remove('je-otevrene');
+  burger.setAttribute('aria-expanded','false');
+  document.body.classList.remove('je-zamknute');
+}));
+document.addEventListener('keydown', e => {
+  if(e.key === 'Escape' && menuEl.classList.contains('je-otevrene')) burger.click();
+});
+
+/* střídání fotek v úvodu
+   Druhou a třetí fotku stahujeme až těsně před tím, než na ni přijde
+   řada, a jen dokud je úvodní obrazovka vidět. Kdo hned sroluje níž,
+   nestáhne je vůbec — první načtení stránky je tím o 350 kB lehčí. */
+(function stridejFotky(){
+  const fotky = $$('.uvod__fotky img');
+  if(fotky.length < 2 || klid) return;
+  let i = 0, vidimeUvod = true, casovac = null;
+
+  const pripravit = n => {
+    const f = fotky[n];
+    if(f && f.dataset.src && !f.getAttribute('src')) f.setAttribute('src', f.dataset.src);
+  };
+
+  const prepnout = () => {
+    if(!vidimeUvod) return;
+    fotky[i].classList.remove('je-videt');
+    i = (i + 1) % fotky.length;
+    fotky[i].classList.add('je-videt');
+    pripravit((i + 1) % fotky.length);
+  };
+
+  new IntersectionObserver(z => {
+    vidimeUvod = z[0].isIntersecting;
+    if(vidimeUvod && !casovac){
+      setTimeout(() => pripravit(1), 4000);
+      casovac = setInterval(prepnout, 7000);
+    } else if(!vidimeUvod && casovac){
+      clearInterval(casovac); casovac = null;
+    }
+  }, { threshold:.15 }).observe($('.uvod'));
+})();
+
+/* běžící pás — rychlost podle šířky, ať jede stejně na mobilu i na monitoru */
+(function pas(){
+  const stopa = $('#pasStopa');
+  if(!stopa) return;
+  const blok = stopa.firstElementChild;
+  for(let i = 0; i < 3; i++) stopa.appendChild(blok.cloneNode(true));
+  const sirka = blok.offsetWidth || 900;
+  stopa.style.setProperty('--pas-doba', Math.max(18, Math.round(sirka / 48)) + 's');
+})();
+
+/* galerie */
+vykresliGalerii();
+$('#galerieMrizka').addEventListener('click', e => {
+  const b = e.target.closest('button[data-i]');
+  if(b) svOtevri(parseInt(b.dataset.i, 10));
+});
+$('#svetloX').addEventListener('click', svZavri);
+$('#svetloZpet').addEventListener('click', () => svUkaz(svIndex - 1));
+$('#svetloVpred').addEventListener('click', () => svUkaz(svIndex + 1));
+svetlo.addEventListener('click', e => { if(e.target === svetlo) svZavri(); });
+document.addEventListener('keydown', e => {
+  if(!svetlo.hasAttribute('open')) return;
+  if(e.key === 'Escape') svZavri();
+  if(e.key === 'ArrowLeft') svUkaz(svIndex - 1);
+  if(e.key === 'ArrowRight') svUkaz(svIndex + 1);
+});
+
+/* mapa až na klepnutí */
+const mapaSpust = $('#mapaSpust');
+if(mapaSpust){
+  mapaSpust.querySelector('button').addEventListener('click', () => {
+    const ram = document.createElement('iframe');
+    ram.src = 'https://www.google.com/maps?q=Restaurace+U+Kapal%C3%ADn%C5%AF%2C+Hostivick%C3%A1+8%2F10%2C+Praha&output=embed&hl=cs';
+    ram.loading = 'lazy';
+    ram.title = 'Mapa — Restaurace U Kapalínů, Hostivická 8/10, Praha 17';
+    ram.setAttribute('referrerpolicy','no-referrer-when-downgrade');
+    ram.allowFullscreen = true;
+    $('#mapa').appendChild(ram);
+    mapaSpust.remove();
+  });
+}
+
+/* plynulé odkazy s odsazením o výšku hlavičky */
+$$('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const cil = a.getAttribute('href');
+    if(cil === '#' || cil.length < 2) return;
+    const el = $(cil);
+    if(!el) return;
+    e.preventDefault();
+    const y = el.getBoundingClientRect().top + window.scrollY - (window.innerWidth > 1100 ? 74 : 62);
+    window.scrollTo({ top:y, behavior: klid ? 'auto' : 'smooth' });
+  });
+});
+
+tlNahoru.addEventListener('click', () => window.scrollTo({ top:0, behavior: klid ? 'auto' : 'smooth' }));
+$('#rok').textContent = new Date().getFullYear();
+
+/* první vykreslení z výchozího obsahu, pak doplnění ze serveru */
+rozdelNadpisy();
+vykresliTyden();
+vykresliListek();
+vykresliAkce();
+vykresliDnes();
+spustNalety();
+spustTitulek();
+priRolovani();
+
+nactiData().then(() => {
+  vykresliTyden();
+  vykresliListek();
+  vykresliAkce();
+  vykresliDnes();
+  $$('[data-nalet]:not(.je-videt)').forEach(el => {
+    const r = el.getBoundingClientRect();
+    if(r.top < window.innerHeight && r.bottom > 0) el.classList.add('je-videt');
+  });
+});
+
+setInterval(vykresliDnes, 60000);
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "ukapalinu-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web restaurace U Kapalínů (Sobín, Praha 17) se správou obsahu",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "@netlify/blobs": "^8.1.0"
+  }
+}

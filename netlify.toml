@@ -1,0 +1,63 @@
+# ════════════════════════════════════════════════════════════════════
+# Nastavení Netlify — Restaurace U Kapalínů
+#
+# Nic se nesestavuje. Netlify jen rozmístí soubory a spustí funkci
+# v netlify/functions/.
+#
+# PO NASAZENÍ JEŠTĚ NASTAVTE (Site configuration → Environment variables):
+#   ADMIN_HESLO   — heslo do administrace
+#   ADMIN_TAJNY   — libovolný náhodný řetězec (aspoň 20 znaků)
+# ════════════════════════════════════════════════════════════════════
+
+[build]
+  publish = "."
+  functions = "netlify/functions"
+  command = ""
+
+[functions]
+  node_bundler = "esbuild"
+
+# ─── Administrace na hezké adrese /admin ───
+[[redirects]]
+  from = "/admin"
+  to = "/admin.html"
+  status = 200
+
+# ─── Bezpečnostní hlavičky ───
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "SAMEORIGIN"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=(), interest-cohort=()"
+
+# HTML se nesmí cachovat natvrdo, jinak by klient po úpravě neviděl změnu
+[[headers]]
+  for = "/index.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/admin.html"
+  [headers.values]
+    Cache-Control = "no-store"
+    X-Robots-Tag = "noindex, nofollow"
+
+[[headers]]
+  for = "/obsah-vychozi.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Fotky se nemění, můžou se cachovat dlouho
+[[headers]]
+  for = "/fotky/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# ─── Přesměrování na www (zapněte po nastavení domény) ───
+# [[redirects]]
+#   from = "https://ukapalinu.cz/*"
+#   to = "https://www.ukapalinu.cz/:splat"
+#   status = 301
+#   force = true

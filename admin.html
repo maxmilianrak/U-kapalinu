@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Správa obsahu — Restaurace U Kapalínů</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='10' fill='%230E2A4D'/%3E%3Ctext x='32' y='46' font-family='Georgia,serif' font-size='38' font-weight='700' fill='%23E9A62B' text-anchor='middle'%3EK%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Figtree:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --inkoust:#0E2A4D; --inkoust-2:#081B34; --modra:#1D4E89; --modra-sv:#2E6BB3;
+  --cervena:#C0392B; --cervena-hi:#D9503F; --zlata:#E9A62B; --zelena:#2E7D4F;
+  --papir:#FDF5E7; --papir-2:#F6EAD4; --papir-3:#E3D4B8; --bila:#FFFDF8;
+  --seda:#5B6B7C; --seda-sv:#A8BACB;
+  --ff-nadpis:"Archivo",Arial,sans-serif;
+  --ff-text:"Figtree",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --ff-data:"DM Mono",ui-monospace,Menlo,monospace;
+  --r:6px; --r-velky:12px;
+  --stin:0 10px 30px rgba(14,42,77,.12);
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0;background:var(--papir-2);color:var(--inkoust);
+  font-family:var(--ff-text);font-size:1rem;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,p,figure{margin:0}
+ul{margin:0;padding:0;list-style:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+a{color:var(--modra)}
+:focus-visible{outline:3px solid var(--cervena);outline-offset:2px;border-radius:3px}
+
+.nadpis{font-family:var(--ff-nadpis);font-variation-settings:"wdth" 108,"wght" 780;font-weight:780;line-height:1.15;letter-spacing:-.015em;padding-block:.02em .08em}
+
+/* ───────── PŘIHLÁŠENÍ ───────── */
+.prihlaseni{min-height:100svh;min-height:100vh;display:grid;place-items:center;padding:1.5rem;background:var(--inkoust)}
+.prihlaseni__karta{
+  width:100%;max-width:400px;background:var(--bila);border-radius:var(--r-velky);
+  padding:clamp(1.6rem,5vw,2.4rem);box-shadow:0 30px 70px rgba(0,0,0,.35);
+}
+.prihlaseni__znak{
+  width:48px;height:48px;border-radius:10px;background:var(--zlata);color:var(--inkoust);
+  display:grid;place-items:center;font-family:var(--ff-nadpis);font-weight:850;font-size:1.6rem;
+  margin-bottom:1.1rem;
+}
+.prihlaseni h1{font-size:1.4rem;margin-bottom:.35rem}
+.prihlaseni p{color:var(--seda);font-size:.93rem;margin-bottom:1.5rem}
+
+/* ───────── APLIKACE ───────── */
+.app{display:none;min-height:100svh;min-height:100vh;flex-direction:column}
+.app.je-videt{display:flex}
+
+.sh{
+  position:sticky;top:0;z-index:20;background:var(--inkoust);color:var(--papir);
+  display:flex;align-items:center;gap:1rem;padding:.7rem clamp(1rem,3vw,1.75rem);
+  box-shadow:0 2px 0 var(--zlata);
+}
+.sh__znacka{display:flex;align-items:center;gap:.6rem;flex:0 0 auto}
+.sh__znak{width:34px;height:34px;border-radius:7px;background:var(--zlata);color:var(--inkoust);display:grid;place-items:center;font-family:var(--ff-nadpis);font-weight:850;font-size:1.1rem}
+.sh__jmeno{display:flex;flex-direction:column;line-height:1.15}
+.sh__jmeno b{font-family:var(--ff-nadpis);font-weight:760;font-size:.98rem}
+.sh__jmeno span{font-family:var(--ff-data);font-size:.6rem;letter-spacing:.14em;color:var(--zlata);text-transform:uppercase}
+.sh__akce{margin-left:auto;display:flex;gap:.5rem;align-items:center;flex-wrap:wrap}
+
+.tl{
+  display:inline-flex;align-items:center;justify-content:center;gap:.5rem;
+  padding:.68rem 1.15rem;border-radius:var(--r);font-weight:700;font-size:.9rem;
+  background:var(--cervena);color:#fff;transition:background .2s,transform .2s,box-shadow .2s;
+  white-space:nowrap;text-decoration:none;
+}
+.tl:hover:not(:disabled){background:var(--cervena-hi);transform:translateY(-1px);box-shadow:0 8px 18px rgba(192,57,43,.3)}
+.tl:disabled{opacity:.5;cursor:not-allowed}
+.tl--zeleny{background:var(--zelena)}
+.tl--zeleny:hover:not(:disabled){background:#36955D;box-shadow:0 8px 18px rgba(46,125,79,.3)}
+.tl--modry{background:var(--modra)}
+.tl--modry:hover:not(:disabled){background:var(--modra-sv);box-shadow:0 8px 18px rgba(29,78,137,.3)}
+.tl--duch{background:transparent;color:var(--papir);box-shadow:inset 0 0 0 2px rgba(253,245,231,.3)}
+.tl--duch:hover:not(:disabled){background:rgba(253,245,231,.12);box-shadow:inset 0 0 0 2px rgba(253,245,231,.55)}
+.tl--maly{padding:.45rem .8rem;font-size:.82rem}
+.tl--plny{width:100%}
+
+/* ───────── ZÁLOŽKY ───────── */
+.zalozky{
+  display:flex;gap:.3rem;padding:0 clamp(1rem,3vw,1.75rem);background:var(--inkoust-2);
+  overflow-x:auto;scrollbar-width:thin;
+}
+.zalozky button{
+  padding:.9rem 1.1rem;font-weight:700;font-size:.92rem;color:var(--seda-sv);
+  border-bottom:3px solid transparent;white-space:nowrap;transition:color .2s,border-color .2s;
+}
+.zalozky button:hover{color:var(--papir)}
+.zalozky button[aria-selected="true"]{color:var(--zlata);border-color:var(--zlata)}
+
+.obsah{flex:1;padding:clamp(1.25rem,3vw,2.25rem);max-width:1100px;width:100%;margin-inline:auto;padding-bottom:7rem}
+.panel{display:none}
+.panel.je-videt{display:block}
+.panel__hlava{margin-bottom:1.5rem}
+.panel__hlava h2{font-size:clamp(1.3rem,3vw,1.75rem);margin-bottom:.35rem}
+.panel__hlava p{color:var(--seda);font-size:.94rem;max-width:62ch}
+
+/* ───────── KARTY A POLE ───────── */
+.karta{
+  background:var(--bila);border:1px solid var(--papir-3);border-radius:var(--r-velky);
+  padding:clamp(1rem,2.2vw,1.4rem);margin-bottom:1rem;
+}
+.karta__hlava{display:flex;align-items:center;gap:.75rem;margin-bottom:1rem;flex-wrap:wrap}
+.karta__hlava h3{font-family:var(--ff-nadpis);font-weight:760;font-size:1.1rem;padding-block:.02em .08em}
+.karta__hlava .vpravo{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap}
+
+.pole{display:flex;flex-direction:column;gap:.3rem;margin-bottom:.85rem}
+.pole label{font-family:var(--ff-data);font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--seda)}
+.pole input,.pole textarea,.pole select{
+  width:100%;padding:.68rem .8rem;border-radius:var(--r);
+  border:1.5px solid var(--papir-3);background:var(--papir);color:var(--inkoust);
+  font-family:var(--ff-text);font-size:.97rem;transition:border-color .2s,background .2s;
+}
+.pole input:focus,.pole textarea:focus,.pole select:focus{outline:none;border-color:var(--modra);background:#fff}
+.pole textarea{resize:vertical;min-height:72px;line-height:1.55}
+.pole__rada{display:grid;gap:.85rem}
+@media (min-width:640px){
+  .pole__rada--2{grid-template-columns:1fr 1fr}
+  .pole__rada--3{grid-template-columns:2fr 1fr 1fr}
+}
+
+/* řádek položky (jídlo / chod) */
+.radek{
+  display:grid;gap:.6rem;padding:.9rem;border-radius:var(--r);
+  background:var(--papir);border:1px solid var(--papir-3);margin-bottom:.6rem;
+  grid-template-columns:1fr;
+}
+@media (min-width:760px){
+  .radek{grid-template-columns:minmax(0,2.1fr) minmax(0,2fr) 108px auto;align-items:start}
+}
+.radek input,.radek textarea{
+  width:100%;padding:.58rem .7rem;border-radius:5px;border:1.5px solid var(--papir-3);
+  background:#fff;font-family:var(--ff-text);font-size:.93rem;
+}
+.radek input:focus,.radek textarea:focus{outline:none;border-color:var(--modra)}
+.radek textarea{resize:vertical;min-height:40px;line-height:1.45}
+.radek .cena{font-family:var(--ff-data);text-align:right}
+.radek__ovl{display:flex;gap:.3rem;align-items:center}
+
+.ikona{
+  width:34px;height:34px;flex:0 0 auto;display:grid;place-items:center;border-radius:5px;
+  background:var(--papir-2);color:var(--seda);transition:background .2s,color .2s;
+}
+.ikona:hover{background:var(--modra);color:#fff}
+.ikona--smazat:hover{background:var(--cervena);color:#fff}
+.ikona:disabled{opacity:.3;cursor:not-allowed}
+.ikona:disabled:hover{background:var(--papir-2);color:var(--seda)}
+
+.pridat{
+  display:inline-flex;align-items:center;gap:.5rem;padding:.6rem 1rem;border-radius:var(--r);
+  background:var(--papir-2);color:var(--modra);font-weight:700;font-size:.88rem;
+  box-shadow:inset 0 0 0 1.5px var(--papir-3);transition:all .2s;
+}
+.pridat:hover{background:var(--modra);color:#fff;box-shadow:none}
+
+.prazdno-info{
+  padding:1.3rem;border:2px dashed var(--papir-3);border-radius:var(--r);
+  color:var(--seda);font-size:.93rem;text-align:center;
+}
+
+/* ───────── SPODNÍ LIŠTA S ULOŽENÍM ───────── */
+.ulozit-lista{
+  position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--bila);
+  border-top:2px solid var(--papir-3);box-shadow:0 -8px 30px rgba(14,42,77,.12);
+  padding:.85rem clamp(1rem,3vw,1.75rem);padding-bottom:calc(.85rem + env(safe-area-inset-bottom));
+  display:flex;align-items:center;gap:1rem;flex-wrap:wrap;
+}
+.ulozit-lista__stav{font-size:.88rem;color:var(--seda);flex:1;min-width:180px}
+.ulozit-lista__stav.je-zmena{color:var(--cervena);font-weight:700}
+.ulozit-lista__stav.je-ok{color:var(--zelena);font-weight:700}
+
+/* ───────── MOBIL ───────── */
+@media (max-width:560px){
+  .sh{gap:.6rem;padding:.6rem .9rem}
+  .sh__jmeno b{font-size:.9rem}
+  .sh__akce{gap:.35rem;flex-wrap:nowrap}
+  .sh__akce .tl{padding:.42rem .62rem;font-size:.76rem}
+  .zalozky{padding:0 .9rem}
+  .zalozky button{padding:.75rem .7rem;font-size:.85rem}
+  .obsah{padding:1.1rem .9rem 9rem}
+  .ulozit-lista{padding:.7rem .9rem;gap:.55rem;padding-bottom:calc(.7rem + env(safe-area-inset-bottom))}
+  .ulozit-lista__stav{flex:1 1 100%;min-width:0;font-size:.8rem;order:-1}
+  .ulozit-lista .tl{flex:1 1 0;padding:.68rem .5rem;font-size:.85rem}
+  .radek{padding:.7rem}
+  .karta{padding:.9rem}
+}
+
+.hlaska{
+  padding:.8rem 1rem;border-radius:var(--r);font-size:.92rem;margin-bottom:1rem;display:none;
+}
+.hlaska.je-videt{display:block}
+.hlaska--chyba{background:#FDE9E7;color:#8E261B;border:1.5px solid #F0B5AE}
+.hlaska--ok{background:#E4F3EA;color:#1E5C38;border:1.5px solid #A9D5BC}
+
+.napoveda{
+  background:#FFF6E0;border:1.5px solid #F0DCA8;border-radius:var(--r);
+  padding:.9rem 1.1rem;font-size:.9rem;color:#6B5420;margin-bottom:1.25rem;
+}
+.napoveda b{color:#4A3A12}
+</style>
+</head>
+
+<body>
+
+<!-- ─────────── PŘIHLÁŠENÍ ─────────── -->
+<div class="prihlaseni" id="prihlaseni">
+  <form class="prihlaseni__karta" id="formPrihlaseni">
+    <div class="prihlaseni__znak" aria-hidden="true">K</div>
+    <h1 class="nadpis">Správa obsahu</h1>
+    <p>Restaurace U Kapalínů</p>
+
+    <div class="hlaska hlaska--chyba" id="chybaPrihlaseni" role="alert"></div>
+
+    <div class="pole">
+      <label for="heslo">Heslo</label>
+      <input type="password" id="heslo" autocomplete="current-password" required>
+    </div>
+
+    <button class="tl tl--plny" type="submit" id="tlPrihlasit">Přihlásit se</button>
+  </form>
+</div>
+
+<!-- ─────────── APLIKACE ─────────── -->
+<div class="app" id="app">
+
+  <header class="sh">
+    <div class="sh__znacka">
+      <span class="sh__znak" aria-hidden="true">K</span>
+      <span class="sh__jmeno"><b>Správa obsahu</b><span>U Kapalínů</span></span>
+    </div>
+    <div class="sh__akce">
+      <a class="tl tl--duch tl--maly" href="/" target="_blank" rel="noopener">Zobrazit web</a>
+      <button class="tl tl--duch tl--maly" type="button" id="tlOdhlasit">Odhlásit</button>
+    </div>
+  </header>
+
+  <nav class="zalozky" role="tablist" aria-label="Části obsahu">
+    <button role="tab" aria-selected="true"  data-panel="tydenni">Polední menu</button>
+    <button role="tab" aria-selected="false" data-panel="stale">Stálý jídelní lístek</button>
+    <button role="tab" aria-selected="false" data-panel="akce">Akce</button>
+  </nav>
+
+  <div class="obsah">
+    <div class="hlaska" id="hlaska" role="status"></div>
+
+    <!-- ══ TÝDENNÍ MENU ══ -->
+    <section class="panel je-videt" id="panel-tydenni" role="tabpanel">
+      <div class="panel__hlava">
+        <h2 class="nadpis">Polední menu</h2>
+        <p>Nabídka na tento týden. Když den necháte prázdný, na webu se u něj
+           objeví „Menu zveřejníme brzy“. Když necháte prázdné všechny dny,
+           celá sekce se na webu nahradí odkazem na WhatsApp.</p>
+      </div>
+
+      <div class="napoveda">
+        <b>Tip:</b> Nejrychlejší je přepsat jen názvy jídel a ceny — struktura
+        dnů zůstává a nemusíte nic přidávat ani mazat.
+      </div>
+
+      <div class="karta">
+        <div class="pole__rada pole__rada--2">
+          <div class="pole">
+            <label for="tydenPlatnost">Období (volitelné)</label>
+            <input type="text" id="tydenPlatnost" placeholder="např. Menu od 6. do 10. října">
+          </div>
+          <div class="pole">
+            <label for="tydenPoznamka">Poznámka pod menu</label>
+            <input type="text" id="tydenPoznamka" placeholder="např. Polévka je v ceně. Výdej 11:00–14:00.">
+          </div>
+        </div>
+      </div>
+
+      <div id="dnyBox"></div>
+      <button class="pridat" type="button" id="pridatDen">+ Přidat den</button>
+    </section>
+
+    <!-- ══ STÁLÝ LÍSTEK ══ -->
+    <section class="panel" id="panel-stale" role="tabpanel">
+      <div class="panel__hlava">
+        <h2 class="nadpis">Stálý jídelní lístek</h2>
+        <p>Nabídka, která se nemění každý týden. Na webu se zobrazuje
+           v záložkách podle kategorií.</p>
+      </div>
+
+      <div class="karta">
+        <div class="pole" style="margin-bottom:0">
+          <label for="stalePoznamka">Poznámka pod lístkem</label>
+          <input type="text" id="stalePoznamka" placeholder="např. Ceny jsou včetně DPH. Alergeny u obsluhy.">
+        </div>
+      </div>
+
+      <div id="kategorieBox"></div>
+      <button class="pridat" type="button" id="pridatKategorii">+ Přidat kategorii</button>
+    </section>
+
+    <!-- ══ AKCE ══ -->
+    <section class="panel" id="panel-akce" role="tabpanel">
+      <div class="panel__hlava">
+        <h2 class="nadpis">Akce</h2>
+        <p>Živá hudba, sportovní přenosy, sezónní akce. Akce s datem v minulosti
+           se z webu samy schovají — nemusíte je mazat.</p>
+      </div>
+
+      <div class="karta">
+        <div class="pole" style="margin-bottom:0">
+          <label for="akcePrazdny">Text, když žádná akce není</label>
+          <textarea id="akcePrazdny" placeholder="Momentálně žádné akce nepořádáme."></textarea>
+        </div>
+      </div>
+
+      <div id="akceBox"></div>
+      <button class="pridat" type="button" id="pridatAkci">+ Přidat akci</button>
+    </section>
+  </div>
+
+  <div class="ulozit-lista">
+    <span class="ulozit-lista__stav" id="stavUlozeni">Načítám obsah…</span>
+    <button class="tl tl--duch tl--maly" type="button" id="tlVychozi"
+            style="color:var(--seda);box-shadow:inset 0 0 0 2px var(--papir-3)">Načíst výchozí lístek</button>
+    <button class="tl tl--zeleny" type="button" id="tlUlozit" disabled>Uložit a zveřejnit</button>
+  </div>
+</div>
+
+<script src="obsah-vychozi.js"></script>
+<script>
+(function(){
+'use strict';
+
+const $  = (s,k=document)=>k.querySelector(s);
+const $$ = (s,k=document)=>[...k.querySelectorAll(s)];
+
+const KLIC_TOKEN = 'ukapalinu-token';
+let DATA = null;
+let zmeneno = false;
+
+/* ───────── pomocné ───────── */
+function token(){ try{ return sessionStorage.getItem(KLIC_TOKEN); }catch{ return null; } }
+function ulozToken(t){ try{ sessionStorage.setItem(KLIC_TOKEN, t); }catch{} }
+function smazToken(){ try{ sessionStorage.removeItem(KLIC_TOKEN); }catch{} }
+
+function kopie(o){ return JSON.parse(JSON.stringify(o)); }
+
+function vychozi(){
+  return (typeof OBSAH_VYCHOZI !== 'undefined')
+    ? kopie(OBSAH_VYCHOZI)
+    : { tydenni:{platnost:'',poznamka:'',dny:[]}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]} };
+}
+
+function hlaska(text, typ){
+  const el = $('#hlaska');
+  el.textContent = text;
+  el.className = 'hlaska je-videt hlaska--' + (typ || 'ok');
+  if(typ === 'ok') setTimeout(() => el.classList.remove('je-videt'), 5000);
+  el.scrollIntoView({ behavior:'smooth', block:'nearest' });
+}
+
+function oznacZmenu(){
+  zmeneno = true;
+  const s = $('#stavUlozeni');
+  s.textContent = 'Máte neuložené změny.';
+  s.className = 'ulozit-lista__stav je-zmena';
+  $('#tlUlozit').disabled = false;
+}
+
+function ikonaSVG(typ){
+  if(typ === 'nahoru') return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg>';
+  if(typ === 'dolu')   return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>';
+  return '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>';
+}
+
+function presun(pole, z, na){
+  if(na < 0 || na >= pole.length) return;
+  const [x] = pole.splice(z, 1);
+  pole.splice(na, 0, x);
+}
+
+/* ═══════════ TÝDENNÍ MENU ═══════════ */
+function vykresliDny(){
+  const box = $('#dnyBox');
+  const dny = DATA.tydenni.dny;
+  box.innerHTML = '';
+
+  if(!dny.length){
+    box.innerHTML = '<div class="prazdno-info">Zatím tu není žádný den. Přidejte ho tlačítkem níž.</div>';
+    return;
+  }
+
+  dny.forEach((den, di) => {
+    const karta = document.createElement('div');
+    karta.className = 'karta';
+    karta.innerHTML =
+      '<div class="karta__hlava">' +
+        '<h3>' + (den.den || 'Nový den') + '</h3>' +
+        '<div class="vpravo">' +
+          '<button class="ikona" type="button" data-akce="nahoru" title="Posunout nahoru"' + (di === 0 ? ' disabled' : '') + '>' + ikonaSVG('nahoru') + '</button>' +
+          '<button class="ikona" type="button" data-akce="dolu" title="Posunout dolů"' + (di === dny.length-1 ? ' disabled' : '') + '>' + ikonaSVG('dolu') + '</button>' +
+          '<button class="ikona ikona--smazat" type="button" data-akce="smazat" title="Smazat den">' + ikonaSVG('smazat') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pole__rada pole__rada--2">' +
+        '<div class="pole"><label>Den</label><input type="text" data-p="den" value=""></div>' +
+        '<div class="pole"><label>Polévka</label><input type="text" data-p="polevka" value="" placeholder="např. Česnečka se sýrem"></div>' +
+      '</div>' +
+      '<div data-jidla></div>' +
+      '<button class="pridat" type="button" data-akce="pridat-jidlo">+ Přidat jídlo</button>';
+
+    karta.querySelector('[data-p="den"]').value = den.den || '';
+    karta.querySelector('[data-p="polevka"]').value = den.polevka || '';
+
+    karta.querySelector('[data-p="den"]').addEventListener('input', e => {
+      den.den = e.target.value; karta.querySelector('h3').textContent = e.target.value || 'Nový den'; oznacZmenu();
+    });
+    karta.querySelector('[data-p="polevka"]').addEventListener('input', e => { den.polevka = e.target.value; oznacZmenu(); });
+
+    const jidlaBox = karta.querySelector('[data-jidla]');
+    if(!Array.isArray(den.jidla)) den.jidla = [];
+    den.jidla.forEach((j, ji) => jidlaBox.appendChild(radekPolozky(j, den.jidla, ji, () => vykresliDny())));
+
+    karta.querySelector('[data-akce="pridat-jidlo"]').addEventListener('click', () => {
+      den.jidla.push({ nazev:'', popis:'', cena:'' }); oznacZmenu(); vykresliDny();
+    });
+    karta.querySelector('[data-akce="nahoru"]').addEventListener('click', () => { presun(dny, di, di-1); oznacZmenu(); vykresliDny(); });
+    karta.querySelector('[data-akce="dolu"]').addEventListener('click',   () => { presun(dny, di, di+1); oznacZmenu(); vykresliDny(); });
+    karta.querySelector('[data-akce="smazat"]').addEventListener('click', () => {
+      if(confirm('Opravdu smazat den „' + (den.den || '') + '“?')){ dny.splice(di,1); oznacZmenu(); vykresliDny(); }
+    });
+
+    box.appendChild(karta);
+  });
+}
+
+/* společný řádek pro jídlo i pro chod ze stálého lístku */
+function radekPolozky(p, pole, i, prekresli){
+  const r = document.createElement('div');
+  r.className = 'radek';
+  r.innerHTML =
+    '<input type="text" data-p="nazev" placeholder="Název jídla">' +
+    '<textarea data-p="popis" rows="1" placeholder="Popis (nepovinné)"></textarea>' +
+    '<input type="text" class="cena" data-p="cena" placeholder="Cena" inputmode="numeric">' +
+    '<div class="radek__ovl">' +
+      '<button class="ikona" type="button" data-akce="nahoru" title="Nahoru"' + (i === 0 ? ' disabled' : '') + '>' + ikonaSVG('nahoru') + '</button>' +
+      '<button class="ikona" type="button" data-akce="dolu" title="Dolů"' + (i === pole.length-1 ? ' disabled' : '') + '>' + ikonaSVG('dolu') + '</button>' +
+      '<button class="ikona ikona--smazat" type="button" data-akce="smazat" title="Smazat">' + ikonaSVG('smazat') + '</button>' +
+    '</div>';
+
+  r.querySelector('[data-p="nazev"]').value = p.nazev || '';
+  r.querySelector('[data-p="popis"]').value = p.popis || '';
+  r.querySelector('[data-p="cena"]').value  = p.cena  || '';
+
+  r.querySelector('[data-p="nazev"]').addEventListener('input', e => { p.nazev = e.target.value; oznacZmenu(); });
+  r.querySelector('[data-p="popis"]').addEventListener('input', e => { p.popis = e.target.value; oznacZmenu(); });
+  r.querySelector('[data-p="cena"]').addEventListener('input',  e => { p.cena  = e.target.value; oznacZmenu(); });
+
+  r.querySelector('[data-akce="nahoru"]').addEventListener('click', () => { presun(pole, i, i-1); oznacZmenu(); prekresli(); });
+  r.querySelector('[data-akce="dolu"]').addEventListener('click',   () => { presun(pole, i, i+1); oznacZmenu(); prekresli(); });
+  r.querySelector('[data-akce="smazat"]').addEventListener('click', () => { pole.splice(i,1); oznacZmenu(); prekresli(); });
+
+  return r;
+}
+
+/* ═══════════ STÁLÝ LÍSTEK ═══════════ */
+function vykresliKategorie(){
+  const box = $('#kategorieBox');
+  const kat = DATA.stale.kategorie;
+  box.innerHTML = '';
+
+  if(!kat.length){
+    box.innerHTML = '<div class="prazdno-info">Lístek je prázdný. Přidejte kategorii, nebo dole klepněte na „Obnovit výchozí lístek“.</div>';
+    return;
+  }
+
+  kat.forEach((k, ki) => {
+    if(!Array.isArray(k.polozky)) k.polozky = [];
+    const karta = document.createElement('div');
+    karta.className = 'karta';
+    karta.innerHTML =
+      '<div class="karta__hlava">' +
+        '<h3>' + (k.nazev || 'Nová kategorie') + '</h3>' +
+        '<span style="font-family:var(--ff-data);font-size:.74rem;color:var(--seda)">' + k.polozky.length + ' položek</span>' +
+        '<div class="vpravo">' +
+          '<button class="ikona" type="button" data-akce="nahoru"' + (ki === 0 ? ' disabled' : '') + ' title="Nahoru">' + ikonaSVG('nahoru') + '</button>' +
+          '<button class="ikona" type="button" data-akce="dolu"' + (ki === kat.length-1 ? ' disabled' : '') + ' title="Dolů">' + ikonaSVG('dolu') + '</button>' +
+          '<button class="ikona ikona--smazat" type="button" data-akce="smazat" title="Smazat kategorii">' + ikonaSVG('smazat') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pole"><label>Název kategorie</label><input type="text" data-p="nazev"></div>' +
+      '<div data-polozky></div>' +
+      '<button class="pridat" type="button" data-akce="pridat-polozku">+ Přidat jídlo do kategorie</button>';
+
+    const vstupNazev = karta.querySelector('[data-p="nazev"]');
+    vstupNazev.value = k.nazev || '';
+    vstupNazev.addEventListener('input', e => {
+      k.nazev = e.target.value; karta.querySelector('h3').textContent = e.target.value || 'Nová kategorie'; oznacZmenu();
+    });
+
+    const polBox = karta.querySelector('[data-polozky]');
+    k.polozky.forEach((p, pi) => polBox.appendChild(radekPolozky(p, k.polozky, pi, () => vykresliKategorie())));
+
+    karta.querySelector('[data-akce="pridat-polozku"]').addEventListener('click', () => {
+      k.polozky.push({ nazev:'', popis:'', cena:'' }); oznacZmenu(); vykresliKategorie();
+    });
+    karta.querySelector('[data-akce="nahoru"]').addEventListener('click', () => { presun(kat, ki, ki-1); oznacZmenu(); vykresliKategorie(); });
+    karta.querySelector('[data-akce="dolu"]').addEventListener('click',   () => { presun(kat, ki, ki+1); oznacZmenu(); vykresliKategorie(); });
+    karta.querySelector('[data-akce="smazat"]').addEventListener('click', () => {
+      if(confirm('Opravdu smazat celou kategorii „' + (k.nazev || '') + '“ i se všemi jídly?')){
+        kat.splice(ki,1); oznacZmenu(); vykresliKategorie();
+      }
+    });
+
+    box.appendChild(karta);
+  });
+}
+
+/* ═══════════ AKCE ═══════════ */
+function vykresliAkce(){
+  const box = $('#akceBox');
+  const a = DATA.akce.polozky;
+  box.innerHTML = '';
+
+  if(!a.length){
+    box.innerHTML = '<div class="prazdno-info">Žádné akce. Na webu se zobrazí text, který jste zadali výš.</div>';
+    return;
+  }
+
+  a.forEach((akce, i) => {
+    const karta = document.createElement('div');
+    karta.className = 'karta';
+    karta.innerHTML =
+      '<div class="karta__hlava">' +
+        '<h3>' + (akce.nazev || 'Nová akce') + '</h3>' +
+        '<div class="vpravo">' +
+          '<button class="ikona" type="button" data-akce="nahoru"' + (i === 0 ? ' disabled' : '') + ' title="Nahoru">' + ikonaSVG('nahoru') + '</button>' +
+          '<button class="ikona" type="button" data-akce="dolu"' + (i === a.length-1 ? ' disabled' : '') + ' title="Dolů">' + ikonaSVG('dolu') + '</button>' +
+          '<button class="ikona ikona--smazat" type="button" data-akce="smazat" title="Smazat akci">' + ikonaSVG('smazat') + '</button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="pole"><label>Název akce</label><input type="text" data-p="nazev" placeholder="např. Živá hudba na zahrádce"></div>' +
+      '<div class="pole__rada pole__rada--2">' +
+        '<div class="pole"><label>Datum (nepovinné)</label><input type="date" data-p="datum"></div>' +
+        '<div class="pole"><label>Čas (nepovinné)</label><input type="text" data-p="cas" placeholder="např. od 18:00"></div>' +
+      '</div>' +
+      '<div class="pole" style="margin-bottom:0"><label>Popis</label><textarea data-p="popis" placeholder="Co se bude dít"></textarea></div>';
+
+    ['nazev','datum','cas','popis'].forEach(p => {
+      const el = karta.querySelector('[data-p="' + p + '"]');
+      el.value = akce[p] || '';
+      el.addEventListener('input', e => {
+        akce[p] = e.target.value;
+        if(p === 'nazev') karta.querySelector('h3').textContent = e.target.value || 'Nová akce';
+        oznacZmenu();
+      });
+    });
+
+    karta.querySelector('[data-akce="nahoru"]').addEventListener('click', () => { presun(a, i, i-1); oznacZmenu(); vykresliAkce(); });
+    karta.querySelector('[data-akce="dolu"]').addEventListener('click',   () => { presun(a, i, i+1); oznacZmenu(); vykresliAkce(); });
+    karta.querySelector('[data-akce="smazat"]').addEventListener('click', () => {
+      if(confirm('Opravdu smazat akci „' + (akce.nazev || '') + '“?')){ a.splice(i,1); oznacZmenu(); vykresliAkce(); }
+    });
+
+    box.appendChild(karta);
+  });
+}
+
+/* ═══════════ VYKRESLENÍ VŠEHO ═══════════ */
+function vykresliVse(){
+  $('#tydenPlatnost').value = DATA.tydenni.platnost || '';
+  $('#tydenPoznamka').value = DATA.tydenni.poznamka || '';
+  $('#stalePoznamka').value = DATA.stale.poznamka || '';
+  $('#akcePrazdny').value   = DATA.akce.prazdnyText || '';
+  vykresliDny();
+  vykresliKategorie();
+  vykresliAkce();
+}
+
+/* ═══════════ NAČTENÍ A ULOŽENÍ ═══════════ */
+function nacti(){
+  return fetch('/api/data', { cache:'no-store' })
+    .then(o => o.ok ? o.json() : {})
+    .then(d => {
+      const v = vychozi();
+      DATA = {
+        tydenni: (d && d.tydenni) ? d.tydenni : v.tydenni,
+        stale:   (d && d.stale)   ? d.stale   : v.stale,
+        akce:    (d && d.akce)    ? d.akce    : v.akce
+      };
+      if(!Array.isArray(DATA.tydenni.dny)) DATA.tydenni.dny = [];
+      if(!Array.isArray(DATA.stale.kategorie)) DATA.stale.kategorie = [];
+      if(!Array.isArray(DATA.akce.polozky)) DATA.akce.polozky = [];
+
+      vykresliVse();
+      zmeneno = false;
+      $('#tlUlozit').disabled = true;
+      const s = $('#stavUlozeni');
+      s.textContent = (d && d.upraveno)
+        ? 'Naposledy uloženo ' + new Date(d.upraveno).toLocaleString('cs-CZ')
+        : 'Obsah zatím nebyl uložen — zobrazuje se výchozí lístek.';
+      s.className = 'ulozit-lista__stav';
+    })
+    .catch(() => {
+      DATA = vychozi();
+      vykresliVse();
+      hlaska('Obsah se nepodařilo načíst ze serveru. Pracujete s výchozím lístkem — uložením ho zveřejníte.', 'chyba');
+    });
+}
+
+function uloz(){
+  const tl = $('#tlUlozit');
+  tl.disabled = true;
+  tl.textContent = 'Ukládám…';
+
+  DATA.tydenni.platnost = $('#tydenPlatnost').value;
+  DATA.tydenni.poznamka = $('#tydenPoznamka').value;
+  DATA.stale.poznamka   = $('#stalePoznamka').value;
+  DATA.akce.prazdnyText = $('#akcePrazdny').value;
+
+  fetch('/api/data', {
+    method: 'POST',
+    headers: { 'content-type':'application/json', 'authorization':'Bearer ' + token() },
+    body: JSON.stringify(DATA)
+  })
+    .then(async o => {
+      const d = await o.json().catch(() => ({}));
+      if(o.status === 401){ odhlas('Přihlášení vypršelo. Přihlaste se prosím znovu.'); return null; }
+      if(!o.ok) throw new Error(d.chyba || ('Chyba ' + o.status));
+      return d;
+    })
+    .then(d => {
+      if(!d) return;
+      zmeneno = false;
+      const s = $('#stavUlozeni');
+      s.textContent = 'Uloženo ' + new Date(d.upraveno || Date.now()).toLocaleString('cs-CZ');
+      s.className = 'ulozit-lista__stav je-ok';
+      hlaska('Hotovo. Změny jsou na webu — stačí stránku obnovit.', 'ok');
+    })
+    .catch(e => {
+      hlaska('Uložení se nepodařilo: ' + e.message, 'chyba');
+      tl.disabled = false;
+    })
+    .finally(() => { tl.textContent = 'Uložit a zveřejnit'; });
+}
+
+/* ═══════════ PŘIHLÁŠENÍ ═══════════ */
+function ukazApp(){
+  $('#prihlaseni').style.display = 'none';
+  $('#app').classList.add('je-videt');
+  nacti();
+}
+
+function odhlas(zprava){
+  smazToken();
+  $('#app').classList.remove('je-videt');
+  $('#prihlaseni').style.display = 'grid';
+  if(zprava){
+    const c = $('#chybaPrihlaseni');
+    c.textContent = zprava;
+    c.classList.add('je-videt');
+  }
+}
+
+$('#formPrihlaseni').addEventListener('submit', e => {
+  e.preventDefault();
+  const tl = $('#tlPrihlasit'), chyba = $('#chybaPrihlaseni');
+  chyba.classList.remove('je-videt');
+  tl.disabled = true; tl.textContent = 'Přihlašuji…';
+
+  fetch('/api/prihlaseni', {
+    method:'POST',
+    headers:{ 'content-type':'application/json' },
+    body: JSON.stringify({ heslo: $('#heslo').value })
+  })
+    .then(async o => {
+      const d = await o.json().catch(() => ({}));
+      if(!o.ok) throw new Error(d.chyba || 'Přihlášení se nepodařilo.');
+      return d;
+    })
+    .then(d => { ulozToken(d.token); $('#heslo').value = ''; ukazApp(); })
+    .catch(e => { chyba.textContent = e.message; chyba.classList.add('je-videt'); })
+    .finally(() => { tl.disabled = false; tl.textContent = 'Přihlásit se'; });
+});
+
+$('#tlOdhlasit').addEventListener('click', () => {
+  if(zmeneno && !confirm('Máte neuložené změny. Opravdu se odhlásit?')) return;
+  odhlas();
+});
+
+/* ═══════════ ZÁLOŽKY ═══════════ */
+$$('.zalozky button').forEach(b => b.addEventListener('click', () => {
+  $$('.zalozky button').forEach(x => x.setAttribute('aria-selected', String(x === b)));
+  $$('.panel').forEach(p => p.classList.toggle('je-videt', p.id === 'panel-' + b.dataset.panel));
+  window.scrollTo({ top:0, behavior:'smooth' });
+}));
+
+/* ═══════════ OSTATNÍ ═══════════ */
+$('#pridatDen').addEventListener('click', () => {
+  DATA.tydenni.dny.push({ den:'', polevka:'', jidla:[] }); oznacZmenu(); vykresliDny();
+});
+$('#pridatKategorii').addEventListener('click', () => {
+  DATA.stale.kategorie.push({ nazev:'', polozky:[] }); oznacZmenu(); vykresliKategorie();
+});
+$('#pridatAkci').addEventListener('click', () => {
+  DATA.akce.polozky.push({ nazev:'', datum:'', cas:'', popis:'' }); oznacZmenu(); vykresliAkce();
+});
+
+['tydenPlatnost','tydenPoznamka','stalePoznamka','akcePrazdny'].forEach(id => {
+  $('#' + id).addEventListener('input', oznacZmenu);
+});
+
+$('#tlUlozit').addEventListener('click', uloz);
+
+$('#tlVychozi').addEventListener('click', () => {
+  if(!confirm('Načíst výchozí jídelní lístek a přepsat tím, co máte na obrazovce?\n\nPřepíše se jen to, co máte na obrazovce — na web se to dostane až po uložení.')) return;
+  DATA = vychozi();
+  vykresliVse();
+  oznacZmenu();
+  hlaska('Výchozí lístek je načtený. Zkontrolujte ho a klepněte na Uložit a zveřejnit.', 'ok');
+});
+
+window.addEventListener('beforeunload', e => {
+  if(zmeneno){ e.preventDefault(); e.returnValue = ''; }
+});
+
+/* start */
+if(token()) ukazApp();
+
+})();
+</script>
+</body>
+</html>
