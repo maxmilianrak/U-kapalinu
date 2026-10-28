@@ -13,16 +13,11 @@
 const OBSAH_VYCHOZI = {
 
   /* ─── TÝDENNÍ MENU ─────────────────────────────────────────────── */
+  /* Jeden text, který klient vloží v administraci. Web si z něj sám
+     poskládá karty podle dnů. Prázdné = na webu se ukáže, že se menu
+     právě připravuje.                                                */
   tydenni: {
-    platnost: "",
-    poznamka: "Polední menu podáváme v pracovní dny od 11:00 do 14:00.",
-    dny: [
-      { den: "Pondělí", polevka: "", jidla: [] },
-      { den: "Úterý",   polevka: "", jidla: [] },
-      { den: "Středa",  polevka: "", jidla: [] },
-      { den: "Čtvrtek", polevka: "", jidla: [] },
-      { den: "Pátek",   polevka: "", jidla: [] }
-    ]
+    text: ""
   },
 
   /* ─── STÁLÝ JÍDELNÍ LÍSTEK ─────────────────────────────────────── */
@@ -117,7 +112,24 @@ const OBSAH_VYCHOZI = {
   akce: {
     prazdnyText: "Momentálně žádné akce nepořádáme. Jakmile budeme něco chystat, najdete to tady.",
     polozky: []
-  }
+  },
+
+  /* ─── FOTKY V GALERII ──────────────────────────────────────────── */
+  /* Dva druhy záznamu:
+       { src:"vycep", popis:"Výčep" }   — fotka ze složky fotky/
+       { id:"a1b2…",  popis:"Zahrádka" } — fotka nahraná v administraci
+     Klient může kteroukoliv smazat, přejmenovat i přeskládat.        */
+  fotky: [
+    { src: "zahradka-hriste",    popis: "Zahrádka s dětským hřištěm" },
+    { src: "akce-zahradka-lide", popis: "Zahrádka při akci" },
+    { src: "vycep",              popis: "Výčep" },
+    { src: "lokal-sud",          popis: "Lokál s televizí" },
+    { src: "akce-ziva-hudba",    popis: "Živá hudba na zahrádce" },
+    { src: "salonek",            popis: "Salonek pro větší společnosti" },
+    { src: "staropramen-sud",    popis: "Staropramen na čepu" },
+    { src: "lokal-pohary",       popis: "Lokál a vitrína s poháry" },
+    { src: "akce-kapela",        popis: "Kapela na zahrádce" }
+  ]
 };
 
 /* export pro prohlížeč i pro Node (serverless funkci) */

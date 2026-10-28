@@ -4,8 +4,8 @@ Web má dvě části:
 
 - **`index.html`** — veřejná stránka. Jeden soubor, otevře se dvojklikem,
   upravuje se ve VS Code.
-- **`/admin`** — správa obsahu pro klienta. Mění tři věci: polední menu,
-  stálý jídelní lístek a akce. Nic jiného rozbít nemůže.
+- **`/admin`** — správa obsahu pro klienta. Mění čtyři věci: polední menu,
+  stálý jídelní lístek, akce a fotky v galerii. Nic jiného rozbít nemůže.
 
 ---
 
@@ -59,21 +59,30 @@ Bez `ADMIN_HESLO` se do administrace nedá přihlásit — funkce vrátí hláš
 Po přidání proměnných **spusťte nové nasazení** (Deploys → Trigger deploy),
 jinak je funkce neuvidí.
 
-### Krok 3 — vyzkoušet
+### Krok 3 — vypnout cizí odznak
+
+Netlify od srpna 2026 přidává novým projektům na volném tarifu odznak
+**„Powered by Netlify"** vpravo dole — na celém webu, ne jen v administraci.
+Vypnete ho v **Project configuration → General → Powered by Netlify badge**.
+Projeví se to při dalším načtení stránky, nové nasazení není potřeba.
+
+### Krok 4 — vyzkoušet
 
 1. Otevřít `vase-adresa.netlify.app/admin`
 2. Přihlásit se heslem
 3. Klepnout na **Načíst výchozí lístek** → **Uložit a zveřejnit**
 4. Zkontrolovat, že se jídelní lístek objevil na webu
+5. V záložce **Fotky** nahrát zkušební fotku, uložit, podívat se do galerie
+   a zase ji smazat
 
-### Krok 4 — doména
+### Krok 5 — doména
 
 Domain settings → Add custom domain → u registrátora přesměrovat DNS.
 HTTPS certifikát se vydá sám. Pak v `netlify.toml` odkomentovat
 přesměrování na www a v `index.html`, `robots.txt` a `sitemap.xml`
 nahradit `https://www.ukapalinu.cz/` finální adresou.
 
-### Krok 5 — po spuštění
+### Krok 6 — po spuštění
 
 - Odeslat `sitemap.xml` v Google Search Console
 - Doplnit odkaz na web do profilu na Google Maps a na Facebook
@@ -99,18 +108,25 @@ odhlásí, což je správně.
 ## 3. Jak to funguje uvnitř
 
 ```
-index.html ──GET──> /api/data ──> Netlify Blobs (úložiště)
-admin.html ──POST─> /api/data      (vyžaduje token)
-           ──POST─> /api/prihlaseni (heslo → token)
+index.html ──GET──> /api/data       ──> Netlify Blobs (úložiště)
+           ──GET──> /api/fotka/<id> ──> nahraná fotka (cache na rok)
+admin.html ──POST─> /api/data           (vyžaduje token)
+           ──POST─> /api/fotka          (vyžaduje token)
+           ──POST─> /api/prihlaseni     (heslo → token)
 ```
 
 Když server neodpoví (třeba při otevření souboru dvojklikem), web si vezme
 výchozí obsah ze souboru **`obsah-vychozi.js`** a vypadá normálně. Nikdy
 se nestane, že by stránka zůstala prázdná.
 
-`obsah-vychozi.js` je jediné místo, kde je výchozí jídelní lístek. Používá
-ho web i administrace. Jakmile klient jednou uloží, čte se všechno
-z úložiště a tenhle soubor už se neuplatní.
+`obsah-vychozi.js` je jediné místo, kde je výchozí jídelní lístek a výchozí
+seznam fotek. Používá ho web i administrace. Jakmile klient jednou uloží,
+čte se všechno z úložiště a tenhle soubor už se neuplatní.
+
+**Nic z toho nespouští nové nasazení.** Klient může měnit menu i fotky,
+jak chce — web se nepřestavuje, jen si přečte nová data. To je důvod, proč
+administrace nezapisuje do GitHubu: každá změna menu by jinak stála jedno
+nasazení (15 kreditů z měsíčních 300).
 
 ---
 
@@ -120,8 +136,8 @@ z úložiště a tenhle soubor už se neuplatní.
 |---|---|
 | `index.html` | Veřejný web |
 | `admin.html` | Správa obsahu, dostupná na `/admin` |
-| `obsah-vychozi.js` | Výchozí jídelní lístek |
-| `netlify/functions/data.mjs` | API — čtení, ukládání, přihlášení |
+| `obsah-vychozi.js` | Výchozí jídelní lístek a výchozí seznam fotek |
+| `netlify/functions/data.mjs` | API — čtení, ukládání, fotky, přihlášení |
 | `netlify.toml` | Nastavení Netlify, hlavičky, přesměrování |
 | `package.json` | Jediná závislost: `@netlify/blobs` |
 | `404.html` | Stránka pro neexistující adresu |
@@ -141,8 +157,11 @@ Tohle jsem bral z toho, co jste poslal, ale stojí za potvrzení:
       vyskakují z řady.
 - [ ] **Kapacita 40 míst** v lokále — převzato ze starších podkladů,
       ne od klienta.
-- [ ] **Které číslo na WhatsApp** — hlavní tlačítka vedou na majitele
-      (603 857 142), tlačítko u oslav na provozní (776 224 351).
+- [x] **Které číslo kam** — všechny objednávky a rezervace vedou na
+      **provozní (776 224 351)**: tlačítka v hlavičce, v úvodu, v galerii,
+      v liště na mobilu, u oslav i v patičce. Majitel (603 857 142) je
+      uvedený jen v kontaktní kartě a v patičce jako kontakt na majitele,
+      ať je vidět, komu podnik patří.
 - [ ] **PSČ** — na webu je jen „Sobín, Praha 17“ bez PSČ, protože
       se zdroje rozcházely.
 - [ ] **Rozvoz obědů** — na webu zatím není, starší podklady ho zmiňovaly.
@@ -192,8 +211,7 @@ zlaté pozadí. Proto se teď jmenuje `hodiny__dnes`.
 
 **Mřížky musí vycházet beze zbytku.** `auto-fit` nechává na posledním
 řádku prázdná místa, která vypadají jako chyba. Sekce „Co u nás najdete"
-má šest dlaždic a pevně 1/2/3 sloupce, galerie má deset dlaždic (devět
-fotek a jednu výzvu) a pevně 1/2/5 sloupců.
+má šest dlaždic a pevně 1/2/3 sloupce.
 
 **Výkon.** Animační smyčka běží jen při rolování, pak usne. Nevracejte
 nekonečné `requestAnimationFrame`. Žádný `blur()` ani `mix-blend-mode`
@@ -209,9 +227,28 @@ aspoň tři fotky (= chybí složka `fotky`); u jedné dvou to ještě asi minut
 potichu zkouší. **Nedávejte sem nic, co fotku skryje hned po první chybě** —
 přesně tím zmizely fotky při rolování na ostré verzi.
 
-**Fotky v galerii** jsou vyjmenované v `index.html` v proměnné `FOTKY`.
-Když přidáte desátou, přibude i jedenáctá dlaždice s výzvou — mřížka
-by přestala vycházet, takže upravte i počet sloupců.
+**Galerie se mění za provozu.** Seznam fotek je součástí obsahu
+z administrace, ne v kódu. Fotek může být 0 až 24, takže mřížka nesmí
+počítat s pevným počtem: sloupce zůstávají 1/2/5 a poslední dlaždice
+(zlatá výzva) dorovná zbytek řádku přes `--span2` a `--span5`, které jí
+nastavuje `vykresliGalerii`. Obsah výzvy se podle vlastní šířky sám
+přerovná ze sloupce do řádku (`@container`), aby v ní při pěti sloupcích
+nezůstala prázdná plocha. **Když budete sahat na počet sloupců, upravte
+i ten výpočet** — jinak se v mřížce objeví díra.
+
+**Fotky se zmenšují v prohlížeči klienta**, ne na serveru — funkce
+`zmensit` v `admin.html`. Z mobilu přijdou 3 MB, na server odchází kolem
+280 kB ve dvou velikostech (1400 px a 720 px). Kdyby se tohle vypnulo, web
+by se návštěvníkům načítal pomalu a klient by to nepoznal. `srovnejBarvy`
+navíc posune barvy k šedé ze 42 % — vnitřní fotky od zářivek tím přestanou
+být žluté, ale zůstanou teplé. Klient to může vypnout zaškrtávátkem.
+
+**Polední menu je obyčejný text.** Klient ho vkládá jako jedno pole, web
+si z něj poskládá karty (`rozdelMenu`, `radkyDne`). Pravidla jsou tři:
+řádek začínající názvem dne zakládá kartu, řádek začínající „Polévka" se
+odliší, a číslo na konci řádku se odsadí jako cena. Co se nepozná, zůstane
+tak, jak to klient napsal — **nic se nikdy nezahodí**. Když v textu žádný
+den není, ukáže se celý text v jednom bloku.
 
 ---
 
