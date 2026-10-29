@@ -13,10 +13,12 @@
 const OBSAH_VYCHOZI = {
 
   /* ─── TÝDENNÍ MENU ─────────────────────────────────────────────── */
-  /* Jeden text, který klient vloží v administraci. Web si z něj sám
-     poskládá karty podle dnů. Prázdné = na webu se ukáže, že se menu
-     právě připravuje.                                                */
+  /* Dvě možnosti, dají se i kombinovat:
+       fotka — vyfocená nástěnka s menem (hlavní způsob)
+       text  — menu napsané ručně; web si z něj poskládá karty podle dnů
+     Když není ani jedno, na webu se ukáže, že se menu právě připravuje. */
   tydenni: {
+    fotka: null,
     text: ""
   },
 

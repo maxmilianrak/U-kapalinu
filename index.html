@@ -564,6 +564,53 @@ table{border-collapse:collapse}
   font-size:1rem;max-width:72ch;
 }
 
+/* ═══════════ VYFOCENÉ MENU ═══════════
+   Majitel vyfotí nástěnku s menem a nahraje ji. Fotka musí být velká —
+   jinak si na ní nikdo nic nepřečte. Šířku volíme podle toho, jestli je
+   na výšku nebo na šířku; skript doplní --sirka a poměr stran, aby se
+   při načítání nehýbal zbytek stránky.                                */
+.menu-foto{margin:0 0 clamp(1.5rem,3vw,2.5rem)}
+.menu-foto__plocha{
+  display:block;width:100%;max-width:var(--sirka,760px);margin-inline:auto;
+  position:relative;overflow:hidden;border-radius:var(--r-velky);
+  background:var(--papir-2);box-shadow:var(--stin);cursor:zoom-in;
+  border:1px solid var(--papir-3);
+}
+.menu-foto__plocha img{display:block;width:100%;height:auto}
+.menu-foto__lupa{
+  position:absolute;right:.75rem;bottom:.75rem;z-index:2;
+  display:inline-flex;align-items:center;gap:.4rem;
+  padding:.5rem .85rem;border-radius:999px;
+  background:rgba(14,42,77,.86);color:var(--papir);
+  font-family:var(--ff-data);font-size:.68rem;letter-spacing:.08em;text-transform:uppercase;
+  opacity:.9;transition:opacity .3s var(--prechod),background .3s var(--prechod);
+}
+.menu-foto__plocha:hover .menu-foto__lupa,
+.menu-foto__plocha:focus-visible .menu-foto__lupa{opacity:1;background:var(--zlata);color:var(--inkoust)}
+.menu-foto__pod{
+  max-width:var(--sirka,760px);margin:.9rem auto 0;
+  display:flex;justify-content:space-between;align-items:baseline;gap:1rem;flex-wrap:wrap;
+  font-family:var(--ff-data);font-size:.74rem;color:var(--seda);letter-spacing:.03em;
+}
+.menu-foto__pod a{color:var(--modra);text-decoration:underline;text-underline-offset:3px}
+.menu-foto__pod a:hover{color:var(--zlata-tl)}
+
+/* Vyfocené menu není fotka k prohlížení, ale dokument ke čtení. Proto se
+   v zvětšení nevejde do výšky okna jako fotky v galerii — roztáhne se
+   do šířky a dá se rolovat. Zavírací křížek a popisek musí být fixed,
+   jinak by s obsahem odrolovaly pryč.                                 */
+.svetlo.je-jedna .svetlo__ovl{display:none}
+.svetlo.je-jedna[open]{display:block;overflow:auto;padding:0;overscroll-behavior:contain}
+.svetlo.je-jedna img{
+  max-width:none;max-height:none;width:min(1120px,94vw);height:auto;display:block;
+  margin:clamp(4rem,9vw,5.5rem) auto clamp(5rem,11vw,6.5rem);
+}
+.svetlo.je-jedna .svetlo__x{position:fixed}
+.svetlo.je-jedna .svetlo__popis{
+  position:fixed;left:0;right:0;bottom:0;padding:.95rem 1rem;
+  background:rgba(7,24,41,.94);
+}
+
 .prazdno{padding:clamp(2rem,4vw,3rem);text-align:center;border:2px dashed var(--papir-3);border-radius:var(--r-velky);color:var(--seda)}
 .prazdno p{max-width:46ch;margin-inline:auto}
 .prazdno .tl{margin-top:1.4rem}
@@ -1064,6 +1111,7 @@ table{border-collapse:collapse}
     </div>
 
     <p class="tyden__uvod" id="tydenUvod"></p>
+    <div id="tydenFoto"></div>
     <div class="tyden" id="tydenObsah"></div>
   </div>
 </section>
@@ -1412,7 +1460,7 @@ function hodinaNaText(h){
 /* ── data z administrace ─────────────────────────────────────────── */
 let DATA = (typeof OBSAH_VYCHOZI !== 'undefined')
   ? JSON.parse(JSON.stringify(OBSAH_VYCHOZI))
-  : { tydenni:{text:''}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]}, fotky:[] };
+  : { tydenni:{text:'',fotka:null}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]}, fotky:[] };
 
 function nactiData(){
   return fetch('/api/data', {cache:'no-store'})
@@ -1500,14 +1548,51 @@ function radkyDne(radky){
   }).join('');
 }
 
+/* vyfocené menu — url a rozměry */
+function menuFotka(){
+  const f = DATA.tydenni && DATA.tydenni.fotka;
+  return (f && f.id) ? f : null;
+}
+
+function vykresliMenuFotku(){
+  const box = $('#tydenFoto');
+  const f = menuFotka();
+  if(!f){ box.innerHTML = ''; return false; }
+
+  const sirka = Number(f.sirka) || 0;
+  const vyska = Number(f.vyska) || 0;
+  /* fotka na výšku se v široké ploše nedá číst, tak ji držíme užší */
+  const naVysku = sirka && vyska ? (sirka / vyska) < 0.95 : true;
+  const max = naVysku ? 820 : 1120;
+  const pomer = (sirka && vyska) ? (sirka + ' / ' + vyska) : 'auto';
+
+  box.innerHTML =
+    '<figure class="menu-foto" style="--sirka:' + max + 'px">' +
+      '<button type="button" class="menu-foto__plocha" style="aspect-ratio:' + pomer + '" ' +
+        'aria-label="Zvětšit fotku poledního menu">' +
+        '<img src="/api/fotka/' + f.id + '-n" alt="Vyfocené polední menu — Restaurace U Kapalínů" ' +
+          (sirka ? 'width="' + sirka + '" height="' + vyska + '" ' : '') + 'decoding="async">' +
+        '<span class="menu-foto__lupa">Klepnutím zvětšíte</span>' +
+      '</button>' +
+      '<figcaption class="menu-foto__pod">' +
+        '<span>Polední menu na tento týden</span>' +
+        '<a href="/api/fotka/' + f.id + '" target="_blank" rel="noopener">Otevřít fotku zvlášť</a>' +
+      '</figcaption>' +
+    '</figure>';
+  return true;
+}
+
 function vykresliTyden(){
   const box = $('#tydenObsah');
   const uvodBox = $('#tydenUvod');
   const text = ((DATA.tydenni && DATA.tydenni.text) || '').trim();
+  const maFotku = vykresliMenuFotku();
 
   if(!text){
     uvodBox.textContent = '';
     box.className = '';
+    /* fotka sama o sobě je plnohodnotné menu — prázdný stav se neukáže */
+    if(maFotku){ box.innerHTML = ''; return; }
     box.innerHTML =
       '<div class="prazdno">' +
       '<h3 class="nadpis nadpis--maly" style="margin-bottom:.6rem">Polední menu právě připravujeme</h3>' +
@@ -1702,6 +1787,9 @@ function vykresliDnes(){
     const dalsi = jidlaDnes.length - 1;
     obed.innerHTML = bezpecne(prvni) +
       (dalsi > 0 ? ' <small>a další ' + dalsi + '</small>' : '');
+  } else if(menuFotka()){
+    /* menu je jen vyfocené — přečíst se z něj tady nedá, odkážeme na ně */
+    obed.innerHTML = 'Menu na tento týden <small>podívejte se níž</small>';
   } else if(den === 0 || den === 6){
     obed.innerHTML = '<small>O víkendu vaříme ze stálého lístku</small>';
   } else {
@@ -1902,24 +1990,41 @@ function vykresliGalerii(){
   $('#galerieMrizka').innerHTML = dlazdice + vyzva;
 }
 
-let svIndex = 0, svFokus = null;
+let svIndex = 0, svFokus = null, svJedna = false;
 const svetlo = $('#svetlo'), svObraz = $('#svetloObraz'), svPopis = $('#svetloPopis');
 
 function svUkaz(i){
   const FOTKY = seznamFotek();
   if(!FOTKY.length) return;
+  svJedna = false;
+  svetlo.classList.remove('je-jedna');
   svIndex = (i + FOTKY.length) % FOTKY.length;
   const f = FOTKY[svIndex];
   svObraz.src = fotkaVelka(f);
   svObraz.alt = (f.popis || 'Fotka') + ' — Restaurace U Kapalínů';
   svPopis.textContent = (f.popis ? f.popis + ' · ' : '') + (svIndex + 1) + ' / ' + FOTKY.length;
 }
-function svOtevri(i){
+
+/* jedna fotka bez listování — pro vyfocené polední menu */
+function svOtevriJednu(url, popis){
+  svJedna = true;
+  svetlo.classList.add('je-jedna');
+  svObraz.src = url;
+  svObraz.alt = popis;
+  svPopis.textContent = popis;
+  svOtevriOkno();
+}
+
+function svOtevriOkno(){
   svFokus = document.activeElement;
-  svUkaz(i);
   svetlo.setAttribute('open','');
   document.body.classList.add('je-zamknute');
   $('#svetloX').focus();
+}
+
+function svOtevri(i){
+  svUkaz(i);
+  svOtevriOkno();
 }
 function svZavri(){
   svetlo.removeAttribute('open');
@@ -2072,6 +2177,13 @@ $('#galerieMrizka').addEventListener('click', e => {
   const b = e.target.closest('button[data-i]');
   if(b) svOtevri(parseInt(b.dataset.i, 10));
 });
+/* zvětšení vyfoceného poledního menu */
+$('#tydenFoto').addEventListener('click', e => {
+  if(!e.target.closest('.menu-foto__plocha')) return;
+  const f = menuFotka();
+  if(f) svOtevriJednu('/api/fotka/' + f.id, 'Polední menu — Restaurace U Kapalínů');
+});
+
 $('#svetloX').addEventListener('click', svZavri);
 $('#svetloZpet').addEventListener('click', () => svUkaz(svIndex - 1));
 $('#svetloVpred').addEventListener('click', () => svUkaz(svIndex + 1));
@@ -2079,6 +2191,7 @@ svetlo.addEventListener('click', e => { if(e.target === svetlo) svZavri(); });
 document.addEventListener('keydown', e => {
   if(!svetlo.hasAttribute('open')) return;
   if(e.key === 'Escape') svZavri();
+  if(svJedna) return;                 /* u jedné fotky není kam listovat */
   if(e.key === 'ArrowLeft') svUkaz(svIndex - 1);
   if(e.key === 'ArrowRight') svUkaz(svIndex + 1);
 });

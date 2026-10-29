@@ -28,8 +28,9 @@ import crypto from "node:crypto";
 const KLIC = "obsah";
 const PLATNOST_HODIN = 12;
 const MAX_FOTEK = 24;
-const MAX_VELKA = 2 * 1024 * 1024;    // 2 MB po dekódování
-const MAX_NAHLED = 700 * 1024;
+/* fotka vyfoceného menu je větší než fotka do galerie — musí se dát přečíst */
+const MAX_VELKA = 3 * 1024 * 1024;    // 3 MB po dekódování
+const MAX_NAHLED = 1024 * 1024;
 
 /* prázdná kostra — když ještě nikdo nic neuložil, web si vezme
    vlastní výchozí obsah ze souboru obsah-vychozi.js */
@@ -98,12 +99,24 @@ function cisteId(v) {
   return /^[a-f0-9]{32}$/.test(s) ? s : "";
 }
 
+function cislo(v, max = 20000) {
+  const n = Math.round(Number(v));
+  return Number.isFinite(n) && n > 0 ? Math.min(n, max) : 0;
+}
+
 function ocisti(vstup) {
   const d = vstup && typeof vstup === "object" ? vstup : {};
   const out = {};
 
   if (d.tydenni && typeof d.tydenni === "object") {
     out.tydenni = { text: text(d.tydenni.text, 8000) };
+    /* vyfocené menu — rozměry si ukládáme, aby web předem věděl,
+       kolik místa fotce nechat a stránka při načítání neposkakovala */
+    const f = d.tydenni.fotka;
+    if (f && typeof f === "object") {
+      const id = cisteId(f.id);
+      if (id) out.tydenni.fotka = { id: id, sirka: cislo(f.sirka), vyska: cislo(f.vyska) };
+    }
   }
 
   if (d.stale && typeof d.stale === "object") {
@@ -199,14 +212,21 @@ async function vydejFotku(store, klic) {
   }
 }
 
-/* smaže obrázky, které klient vyhodil ze seznamu */
-async function uklidFotky(store, stare, nove) {
-  const zbyva = new Set(
-    (Array.isArray(nove) ? nove : []).map(f => f && f.id).filter(Boolean)
-  );
-  const pryc = (Array.isArray(stare) ? stare : [])
-    .map(f => f && f.id)
-    .filter(id => id && !zbyva.has(id));
+/* posbírá id všech nahraných fotek v obsahu — galerie i vyfocené menu */
+function sberId(obsah) {
+  const s = new Set();
+  if (!obsah || typeof obsah !== "object") return s;
+  (Array.isArray(obsah.fotky) ? obsah.fotky : []).forEach(f => { if (f && f.id) s.add(f.id); });
+  if (obsah.tydenni && obsah.tydenni.fotka && obsah.tydenni.fotka.id) {
+    s.add(obsah.tydenni.fotka.id);
+  }
+  return s;
+}
+
+/* smaže obrázky, které v novém obsahu už nikde nejsou */
+async function uklidFotky(store, stary, novy) {
+  const zbyva = sberId(novy);
+  const pryc = [...sberId(stary)].filter(id => !zbyva.has(id));
 
   for (const id of pryc) {
     try {
@@ -290,7 +310,7 @@ export default async (req) => {
       const nova = { ...stara, ...cista, upraveno: new Date().toISOString() };
       await store.setJSON(KLIC, nova);
       /* až po uložení — kdyby mazání selhalo, obsah je v pořádku */
-      if (cista.fotky) await uklidFotky(store, stara.fotky, cista.fotky);
+      await uklidFotky(store, stara, nova);
       return odpoved({ ok: true, upraveno: nova.upraveno });
     } catch (e) {
       return odpoved({ chyba: "Uložení se nepodařilo: " + (e && e.message ? e.message : "neznámá chyba") }, 500);

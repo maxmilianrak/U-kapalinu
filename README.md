@@ -4,8 +4,9 @@ Web má dvě části:
 
 - **`index.html`** — veřejná stránka. Jeden soubor, otevře se dvojklikem,
   upravuje se ve VS Code.
-- **`/admin`** — správa obsahu pro klienta. Mění čtyři věci: polední menu,
-  stálý jídelní lístek, akce a fotky v galerii. Nic jiného rozbít nemůže.
+- **`/admin`** — správa obsahu pro klienta. Mění čtyři věci: polední menu
+  (vyfocená nástěnka), stálý jídelní lístek, akce a fotky v galerii.
+  Nic jiného rozbít nemůže.
 
 ---
 
@@ -72,7 +73,9 @@ Projeví se to při dalším načtení stránky, nové nasazení není potřeba.
 2. Přihlásit se heslem
 3. Klepnout na **Načíst výchozí lístek** → **Uložit a zveřejnit**
 4. Zkontrolovat, že se jídelní lístek objevil na webu
-5. V záložce **Fotky** nahrát zkušební fotku, uložit, podívat se do galerie
+5. V záložce **Polední menu** nahrát fotku menu, uložit, zkontrolovat,
+   že je na webu velká a že jde klepnutím zvětšit
+6. V záložce **Fotky** nahrát zkušební fotku, uložit, podívat se do galerie
    a zase ji smazat
 
 ### Krok 5 — doména
@@ -243,12 +246,24 @@ by se návštěvníkům načítal pomalu a klient by to nepoznal. `srovnejBarvy`
 navíc posune barvy k šedé ze 42 % — vnitřní fotky od zářivek tím přestanou
 být žluté, ale zůstanou teplé. Klient to může vypnout zaškrtávátkem.
 
-**Polední menu je obyčejný text.** Klient ho vkládá jako jedno pole, web
-si z něj poskládá karty (`rozdelMenu`, `radkyDne`). Pravidla jsou tři:
-řádek začínající názvem dne zakládá kartu, řádek začínající „Polévka" se
-odliší, a číslo na konci řádku se odsadí jako cena. Co se nepozná, zůstane
-tak, jak to klient napsal — **nic se nikdy nezahodí**. Když v textu žádný
-den není, ukáže se celý text v jednom bloku.
+**Polední menu je hlavně fotka.** Majitel vyfotí nástěnku a nahraje ji —
+nic nepíše. Fotka se ukládá stejně jako fotky v galerii, jen větší
+(2200 px, kvalita 0,84) a s uloženými rozměry, aby web předem věděl, kolik
+jí nechat místa a stránka při načítání neposkakovala. Na webu je široká
+820 px (na výšku) nebo 1120 px (na šířku) a klepnutím se otevře v režimu
+jedné fotky: ten se **nevejde do výšky okna jako galerie, ale roztáhne se
+do šířky a roluje se** — je to dokument ke čtení, ne fotka k prohlížení.
+Proto má `.svetlo.je-jedna` zavírací křížek a popisek `position:fixed`,
+jinak by s obsahem odrolovaly pryč.
+
+**Napsané menu zůstalo jako nepovinná možnost.** V administraci je
+schované pod rozbalovacím „Menu můžete místo fotky i napsat". Web si
+z textu poskládá karty (`rozdelMenu`, `radkyDne`): řádek začínající názvem
+dne zakládá kartu, řádek začínající „Polévka" se odliší, číslo na konci
+řádku se odsadí jako cena. Co se nepozná, zůstane tak, jak to klient
+napsal — **nic se nikdy nezahodí**. Když vyplní obojí, na webu je fotka
+nahoře a karty pod ní. Jen z fotky se zlatý pruh nahoře dnešní jídlo
+přečíst nedokáže, tak místo něj odkáže na sekci.
 
 ---
 

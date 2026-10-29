@@ -239,6 +239,31 @@ a{color:var(--modra)}
 .fotka__telo input:focus{outline:none;border-color:var(--modra);background:#fff}
 .fotka__ovl{display:flex;gap:.4rem;align-items:center}
 .fotka__zdroj{margin-left:auto;font-family:var(--ff-data);font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--seda)}
+
+/* ─── náhled vyfoceného menu ─── */
+.menu-nahled{margin-top:1.1rem;display:flex;gap:1.1rem;align-items:flex-start;flex-wrap:wrap}
+.menu-nahled img{
+  width:min(100%,260px);border-radius:var(--r);border:1px solid var(--papir-3);
+  background:var(--papir);display:block;
+}
+.menu-nahled__vedle{display:flex;flex-direction:column;gap:.6rem;align-items:flex-start}
+.menu-nahled__udaj{font-family:var(--ff-data);font-size:.75rem;color:var(--seda);line-height:1.6}
+.menu-nahled__udaj b{color:var(--inkoust);font-weight:600}
+
+/* ─── rozbalovací nepovinná část ─── */
+.rozbalit{
+  background:var(--bila);border:1px solid var(--papir-3);border-radius:var(--r-velky);
+  padding:clamp(1rem,2.2vw,1.4rem);margin-bottom:1rem;
+}
+.rozbalit summary{
+  cursor:pointer;font-weight:600;font-size:.95rem;color:var(--modra);
+  list-style:none;display:flex;align-items:center;gap:.5rem;
+}
+.rozbalit summary::-webkit-details-marker{display:none}
+.rozbalit summary::before{content:"+";font-family:var(--ff-data);font-size:1.1rem;line-height:1}
+.rozbalit[open] summary::before{content:"–"}
+.rozbalit[open] summary{margin-bottom:.9rem}
+.rozbalit__pozn{font-size:.9rem;color:var(--seda);line-height:1.6;margin-bottom:1rem;max-width:72ch}
 </style>
 </head>
 
@@ -290,25 +315,48 @@ a{color:var(--modra)}
     <section class="panel je-videt" id="panel-tydenni" role="tabpanel">
       <div class="panel__hlava">
         <h2 class="nadpis">Polední menu</h2>
-        <p>Napište nebo vložte menu na tento týden. Nic se nevyplňuje —
-           stačí text tak, jak ho máte. Když pole necháte prázdné, na webu
-           se objeví, že menu právě připravujete.</p>
+        <p>Vyfoťte nástěnku s menem a nahrajte ji sem. Každý týden jednu
+           novou fotku — ta předchozí se přepíše. Nic psát nemusíte.</p>
       </div>
 
       <div class="napoveda">
-        <b>Jak to web přečte:</b> Řádek, který začíná dnem („Pondělí“), založí
-        nový sloupec. Řádek začínající „Polévka“ se odliší. Když řádek končí
-        číslem, web z něj udělá cenu vpravo. Nic jiného řešit nemusíte —
-        co nepozná, nechá tak, jak jste to napsali.
+        <b>Aby šlo menu přečíst:</b> foťte zpříma a zblízka, ať papír vyplní
+        celý snímek. Pozor na stín vlastního těla a na odlesk od blesku —
+        radši u okna za denního světla. Fotka na webu bude velká a půjde
+        ještě zvětšit klepnutím.
       </div>
 
       <div class="karta">
+        <div class="nahrat">
+          <input type="file" id="souborMenu" accept="image/*" hidden>
+          <button class="tl tl--modry" type="button" id="tlVybratMenu">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            <span id="popisTlMenu">Nahrát fotku menu</span></button>
+          <span class="nahrat__stav" id="stavMenu">—</span>
+        </div>
+        <label class="prepinac">
+          <input type="checkbox" id="srovnatMenu" checked>
+          <span>Srovnat barvy — papír bude bělejší a text čitelnější</span>
+        </label>
+        <div class="nahrat__prubeh" id="prubehMenu" hidden></div>
+        <div id="menuNahled"></div>
+      </div>
+
+      <details class="rozbalit" id="poleText">
+        <summary>Menu můžete místo fotky i napsat (nepovinné)</summary>
+        <p class="rozbalit__pozn">
+          Hodí se, když chcete, aby si menu přečetl i Google a lidé na mobilu
+          bez zvětšování. Když vyplníte obojí, na webu bude fotka nahoře
+          a vypsané menu pod ní. Řádek začínající dnem („Pondělí“) založí
+          nový sloupec, řádek začínající „Polévka“ se odliší a číslo na konci
+          řádku se zobrazí jako cena.
+        </p>
         <div class="pole" style="margin-bottom:0">
           <label for="tydenText">Text poledního menu</label>
           <textarea id="tydenText" class="velke-pole" spellcheck="true"
             placeholder="Menu od 27. do 31. října&#10;&#10;Pondělí&#10;Polévka: česnečka se sýrem&#10;Svíčková na smetaně, knedlík 145&#10;Smažený kuřecí řízek, brambor 139&#10;&#10;Úterý&#10;Polévka: hovězí vývar&#10;Guláš s knedlíkem 139"></textarea>
         </div>
-      </div>
+      </details>
     </section>
 
     <!-- ══ STÁLÝ LÍSTEK ══ -->
@@ -412,7 +460,7 @@ function kopie(o){ return JSON.parse(JSON.stringify(o)); }
 function vychozi(){
   return (typeof OBSAH_VYCHOZI !== 'undefined')
     ? kopie(OBSAH_VYCHOZI)
-    : { tydenni:{text:''}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]}, fotky:[] };
+    : { tydenni:{text:'',fotka:null}, stale:{poznamka:'',kategorie:[]}, akce:{prazdnyText:'',polozky:[]}, fotky:[] };
 }
 
 function hlaska(text, typ){
@@ -584,6 +632,9 @@ function vykresliAkce(){
 const MAX_FOTEK     = 24;
 const SIRKA_VELKA   = 1400;
 const SIRKA_NAHLED  = 720;
+/* vyfocené menu musí jít přečíst, proto větší rozměr i kvalita */
+const MENU_VELKA    = 2200;
+const MENU_NAHLED   = 1200;
 
 const fotkaNahledURL = f => f.id ? ('/api/fotka/' + f.id + '-n') : ('fotky/' + f.src + '-nahled.jpg');
 
@@ -625,6 +676,16 @@ function srovnejBarvy(ctx, w, h){
     }
     ctx.putImageData(obr, 0, 0);
   } catch(e){ /* některé prohlížeče čtení pixelů zakážou — necháme fotku být */ }
+}
+
+/* rozměry po zmenšení — potřebujeme je uložit, aby web věděl,
+   kolik místa fotce nechat */
+function rozmery(obr, delsiStrana){
+  const w = obr.width || obr.naturalWidth;
+  const h = obr.height || obr.naturalHeight;
+  if(!w || !h) throw new Error('obrázek nemá rozměry');
+  const k = Math.min(1, delsiStrana / Math.max(w, h));
+  return { sirka: Math.max(1, Math.round(w * k)), vyska: Math.max(1, Math.round(h * k)) };
 }
 
 function zmensit(obr, delsiStrana, kvalita, srovnat){
@@ -693,6 +754,90 @@ async function nahrajVybranou(soubor){
   }
 }
 
+/* ═══════════ VYFOCENÉ POLEDNÍ MENU ═══════════ */
+
+async function nahrajMenuFotku(soubor){
+  if(!soubor) return;
+  if(soubor.type && !/^image\//.test(soubor.type)){
+    hlaska('Tohle není obrázek. Vyfoťte prosím menu a vyberte tu fotku.', 'chyba');
+    return;
+  }
+
+  const prubeh = $('#prubehMenu');
+  const tl = $('#tlVybratMenu');
+  tl.disabled = true;
+  prubeh.hidden = false;
+  prubeh.textContent = 'Připravuji fotku…';
+
+  try {
+    const obr = await nactiObrazek(soubor);
+    const srovnat = $('#srovnatMenu').checked;
+    const velka  = zmensit(obr, MENU_VELKA,  0.84, srovnat);
+    const nahled = zmensit(obr, MENU_NAHLED, 0.78, srovnat);
+    const r = rozmery(obr, MENU_NAHLED);
+    if(obr.close) obr.close();
+
+    prubeh.textContent = 'Nahrávám… (' + Math.round((velka.length + nahled.length) / 1400) + ' kB)';
+
+    const o = await fetch('/api/fotka', {
+      method: 'POST',
+      headers: { 'content-type':'application/json', 'authorization':'Bearer ' + token() },
+      body: JSON.stringify({ velka: velka, nahled: nahled })
+    });
+    const d = await o.json().catch(() => ({}));
+    if(o.status === 401){ odhlas('Přihlášení vypršelo. Přihlaste se prosím znovu.'); return; }
+    if(!o.ok) throw new Error(d.chyba || ('chyba ' + o.status));
+
+    DATA.tydenni.fotka = { id: d.id, sirka: r.sirka, vyska: r.vyska };
+    oznacZmenu();
+    vykresliMenuNahled();
+    hlaska('Fotka menu je nahraná. Klepněte na Uložit a zveřejnit.', 'ok');
+  } catch(e){
+    hlaska('Fotku se nepodařilo nahrát: ' + (e && e.message ? e.message : 'neznámá chyba'), 'chyba');
+  } finally {
+    prubeh.hidden = true;
+    tl.disabled = false;
+    $('#souborMenu').value = '';
+  }
+}
+
+function vykresliMenuNahled(){
+  const box = $('#menuNahled');
+  const f = DATA.tydenni && DATA.tydenni.fotka;
+  const stav = $('#stavMenu');
+  const popis = $('#popisTlMenu');
+
+  if(!f || !f.id){
+    box.innerHTML = '';
+    stav.textContent = 'Zatím žádná fotka';
+    popis.textContent = 'Nahrát fotku menu';
+    return;
+  }
+
+  stav.textContent = 'Fotka je nahraná';
+  popis.textContent = 'Nahradit jinou fotkou';
+
+  box.innerHTML =
+    '<div class="menu-nahled">' +
+      '<img src="/api/fotka/' + f.id + '-n" alt="Náhled nahraného menu">' +
+      '<div class="menu-nahled__vedle">' +
+        '<p class="menu-nahled__udaj"><b>Takhle to bude na webu.</b><br>' +
+          'Fotka ' + (f.sirka || '?') + ' × ' + (f.vyska || '?') + ' bodů.<br>' +
+          'Návštěvník si ji může klepnutím zvětšit.</p>' +
+        '<a class="tl tl--duch tl--maly" style="color:var(--modra);box-shadow:inset 0 0 0 2px var(--papir-3)" ' +
+          'href="/api/fotka/' + f.id + '" target="_blank" rel="noopener">Otevřít ve skutečné velikosti</a>' +
+        '<button class="tl tl--maly" type="button" id="tlSmazatMenu">Odebrat fotku</button>' +
+      '</div>' +
+    '</div>';
+
+  $('#tlSmazatMenu').addEventListener('click', () => {
+    if(!confirm('Opravdu odebrat fotku menu?\n\nZ webu zmizí po uložení.')) return;
+    DATA.tydenni.fotka = null;
+    oznacZmenu();
+    vykresliMenuNahled();
+  });
+}
+
 function vykresliFotky(){
   const box = $('#fotkyBox');
   const fotky = DATA.fotky;
@@ -743,6 +888,9 @@ function vykresliVse(){
   $('#tydenText').value     = DATA.tydenni.text || '';
   $('#stalePoznamka').value = DATA.stale.poznamka || '';
   $('#akcePrazdny').value   = DATA.akce.prazdnyText || '';
+  /* když menu napsané je, rozbalíme tu nepovinnou část, ať ho klient vidí */
+  $('#poleText').open = !!(DATA.tydenni.text || '').trim();
+  vykresliMenuNahled();
   vykresliKategorie();
   vykresliAkce();
   vykresliFotky();
@@ -761,6 +909,7 @@ function nacti(){
         fotky:   (d && Array.isArray(d.fotky)) ? d.fotky : v.fotky
       };
       if(typeof DATA.tydenni.text !== 'string') DATA.tydenni.text = '';
+      if(!DATA.tydenni.fotka || !DATA.tydenni.fotka.id) DATA.tydenni.fotka = null;
       if(!Array.isArray(DATA.stale.kategorie)) DATA.stale.kategorie = [];
       if(!Array.isArray(DATA.akce.polozky)) DATA.akce.polozky = [];
       if(!Array.isArray(DATA.fotky)) DATA.fotky = [];
@@ -877,6 +1026,9 @@ $('#pridatAkci').addEventListener('click', () => {
 
 $('#tlVybrat').addEventListener('click', () => $('#souborFotky').click());
 $('#souborFotky').addEventListener('change', e => nahrajVybranou(e.target.files && e.target.files[0]));
+
+$('#tlVybratMenu').addEventListener('click', () => $('#souborMenu').click());
+$('#souborMenu').addEventListener('change', e => nahrajMenuFotku(e.target.files && e.target.files[0]));
 
 ['tydenText','stalePoznamka','akcePrazdny'].forEach(id => {
   $('#' + id).addEventListener('input', oznacZmenu);
